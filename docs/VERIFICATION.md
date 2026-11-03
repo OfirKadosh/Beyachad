@@ -2,7 +2,7 @@
 
 Passed on the delivered source:
 
-- `npm run check`: TypeScript, Expo ESLint, 32 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
+- `npm run check`: TypeScript, Expo ESLint, 45 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
 - `npx expo install --check`: SDK-compatible dependencies.
 - `npm run export:web`: release web bundle generated successfully.
 - Chromium UI smoke: empty initial fields, generic wedding creation, recommendation
@@ -47,3 +47,15 @@ project dependency. Portable core tests and GitHub CI are included in the source
 - PGlite executes migration 003 against a baseline fixture and checks read RLS,
   RPC membership, anonymous denial, direct-write denial, idempotency, versions and totals.
   Hosted Realtime and physical-device tests remain separate checks.
+
+## v0.4 guest invitations
+
+- Domain and PostgreSQL tests: invitation/person reconciliation, partial RSVP,
+  per-age limits, invalid states, stable sides, private reads, RPC-only mutations,
+  idempotent create, optimistic edit/delete conflicts and anonymous denial.
+- Paged loading tested with 1,201 rows and a simulated 100-row server cap.
+- Hosted Supabase Auth/Realtime and physical iPhone checks remain separate.
+- Browser UI flow passed: empty-form validation, partial confirmations, dietary search,
+  status/side/group filters, duplicate phone advisory, Home summary, persistent coexistence
+  with tasks/vendors, stale-draft preservation and confirmed deletion.
+- Guest list/editor fit at 320 / 390 / 736 px without runtime or console errors.

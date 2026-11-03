@@ -1,3 +1,4 @@
+import { GuestProvider } from "../providers/GuestProvider";
 import { FinanceProvider } from "../providers/FinanceProvider";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -42,6 +43,7 @@ function WeddingRoutes() {
         <Stack.Screen name="vendor-editor" />
         <Stack.Screen name="vendor-detail" />
         <Stack.Screen name="payment-editor" />
+        <Stack.Screen name="guest-editor" />
       </Stack.Protected>
     </Stack>
   );
@@ -61,13 +63,16 @@ function Routes() {
           <Stack.Screen name="vendor-editor" />
           <Stack.Screen name="vendor-detail" />
           <Stack.Screen name="payment-editor" />
+          <Stack.Screen name="guest-editor" />
         </Stack.Protected>
       </Stack>
     );
   return (
     <WeddingProvider key={auth.userId}>
       <FinanceProvider>
-        <WeddingRoutes />
+        <GuestProvider>
+          <WeddingRoutes />
+        </GuestProvider>
       </FinanceProvider>
     </WeddingProvider>
   );

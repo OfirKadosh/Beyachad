@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — Guest invitations and manual RSVP
+
+- Create/edit/delete invitations for families, couples or individuals.
+- Track invited and confirmed adults/children, including partial confirmations.
+- Store side, group, contact, phone, dietary requirements and notes privately.
+- Add RSVP/side/group filters, search, phone-duplicate advisory and Home totals.
+- Preserve drafts on stale changes, use idempotent create IDs and confirmed deletion.
+- Page through cloud rows and preserve all existing local workspace modules.
+- Add migration 004, count/permission tests and a Hebrew remaining-work roadmap.
+- Align recommended Expo SDK 58 compatibility patches.
+
+Existing Supabase projects apply migration 004 after 003. RSVP is manual; public
+links, messaging, Excel and seating are future extensions.
+
 ## 0.3.0 — Budget and vendors
 
 - Create/edit/search vendor cards with contact details, category, quote, agreed cost and status.

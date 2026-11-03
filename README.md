@@ -1,8 +1,8 @@
 # ביחד · Beyachad
 
 A private, Hebrew-first wedding planner for two partners. Expo SDK 58, React Native,
-TypeScript and Expo Router. Version 0.3.0 includes tasks, budget and vendors.
-Guest management and the remaining planning modules are still to come.
+TypeScript and Expo Router. Version 0.4.0 includes tasks, budget, vendors and guest invitations with manual RSVP.
+Meetings, reminders and distribution acceptance remain on the roadmap.
 
 ## Run locally (Windows / macOS / Linux)
 
@@ -37,7 +37,7 @@ signing setup; no app was signed, uploaded or published by this deliverable.
 1. Create a Supabase project in your own account.
 2. Run the SQL files in `supabase/migrations/` in filename order in its SQL editor.
    Existing installations run only migrations newer than those already applied.
-   v0.2 needs `202611030003_budget_vendors.sql`; v0.1 needs migrations 002 and 003.
+   v0.3 needs migration 004; v0.2 needs 003 and 004; v0.1 needs 002–004.
 3. Copy `.env.example` to `.env`. Set the project HTTPS URL and **publishable** key.
    Never use a service-role key or database password in the app.
 4. Keep email confirmation enabled; configure the public Site URL / confirmation
@@ -84,12 +84,15 @@ behavior still need physical-device acceptance testing.
 - Scheduled and paid payment records, including deposits, edited in place without duplication.
 - Integer-agora arithmetic, stable operation IDs, transactional server validation and conflicts.
 - Shared local storage updates preserve task and finance data together.
-- Five navigation tabs and settings; guest management remains a future module.
+- Guest/family invitations with adult/child counts, partial RSVP, sides, groups, contact
+  details, dietary notes and manual attendance tracking.
+- Search/filters, invitation versus person totals, paged cloud loading and private access.
+- Five functional navigation tabs plus protected editors and settings.
 - Loading, error and retry states; restrained stack transitions.
 
 ## Still to build
 
-Guests/RSVP, document uploads, editable wedding names/date,
+Public RSVP links, document uploads, editable wedding names/date,
 reminders, seating, import/export, account
 deletion and password recovery. Do not publish for general use before recovery,
 deletion, privacy/support pages and production acceptance checks are complete.
@@ -136,7 +139,7 @@ See `docs/ACCEPTANCE.md` for the next validation steps.
 ## Finance upgrade (v0.3)
 
 Apply migration 003 before connecting this app version to an existing v0.2 backend.
-Fresh projects apply all three migrations in order. Development workspaces add
+Fresh projects apply every migration in filename order. Development workspaces add
 empty vendor/payment arrays on load; there is no reset or deletion of existing tasks.
 Rebuild an installed development client after adding the native expo-crypto module.
 
@@ -152,3 +155,25 @@ Financial writes use membership-checked RPCs with vendor row locks and version
 checks. Stable UUIDs make create retries idempotent. Authenticated clients have
 read-only direct access to finance tables; all writes must use these RPCs.
 Offline full editing and hosted cross-device acceptance remain separate work.
+
+## Guest invitations (v0.4)
+
+Apply `202611030004_guests_rsvp.sql` after migrations 001–003. Existing local data
+adds an empty guest array without resetting tasks, suppliers, payments or budget.
+A guest record is one invitation/family with separate invited and confirmed adult
+and child counts. Pending invitations have no confirmed people. Confirmed families
+may be partial; their unconfirmed people count as not attending. Therefore invited
+people = confirmed + pending + not attending. Dietary notes belong to the whole
+invitation and should specify quantities/people, not imply every family member.
+
+Manual RSVP only: no guest-facing links or messages are sent. Stable wedding sides
+remain consistent for both partners. Matching phone numbers trigger an advisory,
+not automatic deduplication, because multiple invitations may share a contact.
+RPC-only writes validate membership, counts and expected versions. Create retries
+use stable IDs; contacts and dietary notes are protected by read RLS. Cloud loading
+pages through visible rows so server row caps do not silently truncate totals.
+
+The remaining first-release work and later extras are listed in `docs/ROADMAP-he.md`.
+
+SDK 58 compatibility patches are aligned in v0.4. Rebuild an existing native
+development client before the physical-device acceptance pass.

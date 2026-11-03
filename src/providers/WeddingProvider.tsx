@@ -285,6 +285,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
         tasks: [],
         vendors: [],
         payments: [],
+        guests: [],
       }));
       generation.current++;
       setWedding(null);

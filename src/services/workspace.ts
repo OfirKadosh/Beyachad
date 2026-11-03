@@ -1,3 +1,4 @@
+import type { GuestInvitation } from "../core/guests";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Wedding, Task } from "../core/domain";
 import type { FinanceState } from "../core/finance";
@@ -5,12 +6,14 @@ export const WORKSPACE_KEY = "beyachad.development.v1";
 export type LocalWorkspace = FinanceState & {
   wedding: Wedding | null;
   tasks: Task[];
+  guests: GuestInvitation[];
 };
 const empty = (): LocalWorkspace => ({
   wedding: null,
   tasks: [],
   vendors: [],
   payments: [],
+  guests: [],
 });
 let queue: Promise<unknown> = Promise.resolve();
 export async function readWorkspace(): Promise<LocalWorkspace> {

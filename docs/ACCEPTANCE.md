@@ -69,3 +69,16 @@ Apply migration 003 after migration 002 on an existing Supabase backend.
 - Price/status changes and deletion must respect existing payment allocations.
 - An unrelated account must not read/write finance records or call RPCs for another wedding.
 - Rebuild an installed native development client to include expo-crypto.
+
+## Guest invitation acceptance
+
+Apply migration 004 after the previous migrations.
+
+- Both partners can manage invitations; an unrelated account cannot read contact/dietary data.
+- One family is one invitation but may contain several invited/confirmed people.
+- Partial RSVP respects separate adult/child limits and reconciles the global totals.
+- Side/group/status filters and dietary/contact search work without changing global summaries.
+- Duplicate phones produce an advisory while allowing legitimate separate invitations.
+- Stale edits preserve the draft; delete requires confirmation and an up-to-date version.
+- Verify live create/update/delete synchronization on two devices and a list above 1,000 rows.
+- No guest-facing messages or links are sent by manual RSVP actions.

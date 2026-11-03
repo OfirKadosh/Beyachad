@@ -1,3 +1,5 @@
+import { useGuests } from "../../providers/GuestProvider";
+import { guestTotals } from "../../core/guests";
 import { useFinance } from "../../providers/FinanceProvider";
 import { budgetTotals } from "../../core/finance";
 import { money } from "../../core/money";
@@ -26,6 +28,8 @@ export default function Home() {
   const { isDemo } = useAuth();
   const action = useAction();
   const finance = useFinance();
+  const guests = useGuests();
+  const people = guestTotals(guests.guests);
   const budget = budgetTotals(
     finance,
     wedding?.budget == null ? null : Math.round(wedding.budget * 100),
@@ -86,6 +90,22 @@ export default function Home() {
             title="לפרטי התקציב"
             secondary
             onPress={() => router.navigate("/budget")}
+          />
+        </Card>
+      )}
+      {!guests.loading && !guests.error && (
+        <Card>
+          <Text style={styles.heading}>האנשים שיחגגו איתנו</Text>
+          <Text style={styles.text}>
+            {people.confirmed} מאשרים מתוך {people.invited} מוזמנים
+          </Text>
+          <Text style={styles.muted}>
+            {people.invitations} הזמנות · {people.pending} אנשים טרם השיבו
+          </Text>
+          <Button
+            title="לרשימת המוזמנים"
+            secondary
+            onPress={() => router.navigate("/guests")}
           />
         </Card>
       )}
