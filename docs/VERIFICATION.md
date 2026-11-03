@@ -2,7 +2,7 @@
 
 Passed on the delivered source:
 
-- `npm run check`: TypeScript (app + server handler), Expo ESLint, 76 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
+- `npm run check`: TypeScript (app + server handler), Expo ESLint, 79 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
 - `npx expo install --check`: SDK-compatible dependencies.
 - `npm run export:web`: release web bundle generated successfully.
 - Chromium UI smoke: empty initial fields, generic wedding creation, recommendation
@@ -107,3 +107,14 @@ project dependency. Portable core tests and GitHub CI are included in the source
 - Production Web export and iOS JavaScript/Hermes export passed. Signed native builds,
   live Supabase/Storage/Edge integration, multi-device Realtime, biometrics and actual
   iPhone notification delivery remain the release checks in RELEASE-he.md.
+
+## v0.6.1 authentication configuration
+
+- 79 automated tests, app/server TypeScript and lint passed; production Web export passed.
+- Configured browser Auth flows passed with the legacy EXPO_PUBLIC_SUPABASE_ANON_KEY
+  name, including recovery and deletion against mocked endpoints.
+- Missing-config production browser flow stays blocked even with a valid email,
+  matching 10-character passwords, and displays the configuration explanation.
+- Diagnostic tests verify env precedence, absent/invalid URLs, empty keys, legacy-key
+  fallback, disabled dotenv loading, Windows .env.txt hints and value-free output.
+- These checks do not verify the user's local env file or a live signup request.

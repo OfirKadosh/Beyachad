@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.1 — Explain disabled account buttons
+
+- Show missing/invalid Supabase configuration above the authentication form.
+- Accept the legacy EXPO_PUBLIC_SUPABASE_ANON_KEY alias and trim env values.
+- Validate HTTPS base URLs and reject modern server-secret keys in the client.
+- Add a safe config:check diagnostic for env precedence, Windows .env.txt naming
+  and disabled Expo env loading; output omits URL/key values.
+- Add configuration regression checks and visible registration password guidance.
+
 ## 0.6.0 — Color, motion and daily-use completion
 
 - Refresh all shared screens with teal/purple/peach, branded app assets, softer cards and focus states.

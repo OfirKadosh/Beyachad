@@ -13,7 +13,7 @@ import {
 } from "../components/ui";
 import { useAuth } from "../providers/AuthProvider";
 import { requireBackend } from "../services/backend";
-import { backendConfigured } from "../services/config";
+import { backendConfigured, backendConfigMessage } from "../services/config";
 export default function AuthScreen() {
   const auth = useAuth();
   const action = useAction();
@@ -91,6 +91,12 @@ export default function AuthScreen() {
         מרחב פרטי לחתונה שלכם. לכל אחד חשבון משלו, ולשניכם תוכנית משותפת.
       </Text>
       <Card>
+        {!backendConfigured && (
+          <Notice
+            error
+            text={`הכניסה וההרשמה מושבתות כי הגדרות החיבור לא נטענו. ${backendConfigMessage} שמרו את קובץ .env לצד package.json והפעילו מחדש את האפליקציה.`}
+          />
+        )}
         <Field
           label="אימייל"
           value={email}
@@ -108,6 +114,11 @@ export default function AuthScreen() {
           autoComplete={mode === "login" ? "current-password" : "new-password"}
           textContentType={mode === "login" ? "password" : "newPassword"}
         />
+        {mode === "register" && (
+          <Text style={styles.muted}>
+            לפחות 10 תווים. אימות הסיסמה חייב להיות זהה.
+          </Text>
+        )}
         {mode === "register" && (
           <Field
             label="אימות סיסמה"
@@ -147,9 +158,6 @@ export default function AuthScreen() {
         secondary
         onPress={() => router.push("/privacy")}
       />
-      {!backendConfigured && (
-        <Notice text="מסכי החשבונות מוכנים. להפעלתם יש לחבר את שירות החשבונות לפי README; אין התחברות מדומה בפרודקשן." />
-      )}
       <Text style={styles.muted}>
         אפשר להפעיל Face ID או Touch ID בהגדרות, לאחר התחברות ראשונה במכשיר
         תומך.

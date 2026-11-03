@@ -1,6 +1,6 @@
 {
   "name": "beyachad",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -47,7 +47,8 @@
     "lint": "expo lint",
     "test": "node --import tsx --test tests/*.test.ts",
     "check": "npm run typecheck && npm run lint && npm test",
-    "export:web": "node scripts/start.mjs --release"
+    "export:web": "node scripts/start.mjs --release",
+    "config:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-config.mjs"
   },
   "private": true
 }

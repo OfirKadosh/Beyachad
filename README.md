@@ -150,6 +150,32 @@ and physical iPhones, then configure your operator/support/privacy details and
 Apple/Expo signing. The app has not been published or signed here. Public RSVP
 links, seating, Excel import/export and guest messaging remain optional future scope.
 
+## Sign-up button disabled?
+
+The login/sign-up button is disabled when the app cannot read a usable Supabase
+URL and public key. Password/email fields do not control this disabled state.
+Place `.env` beside `package.json` (not `.env.txt`), and use these exact names:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLIC_KEY
+```
+
+`EXPO_PUBLIC_SUPABASE_ANON_KEY` is also accepted for legacy anon keys when the
+publishable-key variable is empty. Bare `SUPABASE_URL`, `SUPABASE_ANON_KEY` and
+`VITE_` names are not embedded by Expo. Whitespace around values is ignored.
+Check the resolved files and missing variable names without printing key values:
+
+```sh
+npm run config:check
+npm run start:auth -- --web --clear
+```
+
+The diagnostic follows Expo's development env-file precedence; pass
+`npm run config:check -- --production` for production. The auth screen now shows
+missing/invalid configuration directly above the form. This check validates local
+configuration, not the project's network availability, key validity or signup policy.
+
 ## Checks
 
 ```sh
