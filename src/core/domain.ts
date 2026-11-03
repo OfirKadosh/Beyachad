@@ -9,10 +9,15 @@ export type Task = {
   id: string;
   wedding_id: string;
   title: string;
-  owner: "both" | "me" | "partner";
+  owner: "both" | "one" | "two";
   completed: boolean;
   recommendation_key: string | null;
   version: number;
+  status: "todo" | "in_progress" | "done";
+  priority: "low" | "normal" | "high";
+  category: "general" | "budget" | "venue" | "guests" | "vendors" | "personal";
+  due_date: string | null;
+  notes: string;
 };
 export const recommendations = [
   {

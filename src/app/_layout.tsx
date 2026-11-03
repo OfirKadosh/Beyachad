@@ -37,6 +37,7 @@ function WeddingRoutes() {
       <Stack.Protected guard={!!wedding}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="task-editor" />
       </Stack.Protected>
     </Stack>
   );
@@ -52,6 +53,7 @@ function Routes() {
           <Stack.Screen name="setup" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="settings" />
+          <Stack.Screen name="task-editor" />
         </Stack.Protected>
       </Stack>
     );

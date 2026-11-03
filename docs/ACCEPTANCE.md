@@ -9,7 +9,21 @@
 - Reset demo in Settings requires a second explicit confirmation.
 - Tabs for vendors and guests clearly explain that CRUD is future work.
 
+## Task management
+
+- Create/edit all task fields, including a blank optional deadline and notes.
+- Verify each partner sees their own assignments plus shared tasks under Mine.
+- Search title and notes; combine category/status filters and due/priority sorting.
+- Completed work is excluded from overdue indicators.
+- Saving from a filtered view returns to an unfiltered list so the saved task is visible.
+- Canceling deletion preserves the task; confirmed deletion removes it for both partners.
+- A stale edit/delete is rejected; the editor keeps the draft and requests reopening.
+- Local v0.1 data upgrades on load without clearing existing tasks.
+
 ## Connected staging (requires a real Supabase project)
+
+Apply `202611030002_task_management.sql` once to existing v0.1 databases first.
+
 
 1. Disable demo via `npm run start:auth`; sign up and verify email.
 2. Close/reopen the iOS app: the native session restores without password entry.

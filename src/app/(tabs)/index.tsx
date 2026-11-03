@@ -10,13 +10,26 @@ import {
   useAction,
 } from "../../components/ui";
 import { recommendations, weddingTitle } from "../../core/domain";
+import {
+  assigneeLabel,
+  formatDueDate,
+  isOverdue,
+  selectTasks,
+} from "../../core/tasks";
 import { useWedding } from "../../providers/WeddingProvider";
 import { useAuth } from "../../providers/AuthProvider";
 export default function Home() {
-  const { wedding, tasks, addTask } = useWedding();
+  const { wedding, tasks, viewerSlot, addTask } = useWedding();
   const { isDemo } = useAuth();
   const action = useAction();
   const open = tasks.filter((t) => !t.completed);
+  const upcoming = selectTasks(tasks, {
+    filter: "open",
+    query: "",
+    sort: "due",
+    viewer: viewerSlot,
+  }).slice(0, 3);
+  const overdue = open.filter((t) => isOverdue(t)).length;
   return (
     <Screen>
       <View style={styles.row}>
@@ -46,6 +59,35 @@ export default function Home() {
         </Text>
         <Button title="למשימות שלנו" onPress={() => router.push("/tasks")} />
       </Card>
+      {upcoming.length > 0 && (
+        <Card>
+          <Text accessibilityRole="header" style={styles.heading}>
+            הצעדים הקרובים
+          </Text>
+          {overdue > 0 && (
+            <Notice text={`${overdue} משימות עברו את תאריך היעד`} error />
+          )}
+          {upcoming.map((task) => (
+            <View key={task.id} style={{ gap: 6 }}>
+              <Text style={styles.text}>{task.title}</Text>
+              <Text style={styles.muted}>
+                {formatDueDate(task.due_date)} ·{" "}
+                {assigneeLabel(task.owner, wedding, viewerSlot)}
+              </Text>
+              <Button
+                title={`פתיחת משימה: ${task.title}`}
+                secondary
+                onPress={() =>
+                  router.push({
+                    pathname: "/task-editor",
+                    params: { id: task.id },
+                  })
+                }
+              />
+            </View>
+          ))}
+        </Card>
+      )}
       <Text accessibilityRole="header" style={styles.heading}>
         מומלץ להתחיל כאן
       </Text>

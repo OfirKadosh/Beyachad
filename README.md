@@ -1,7 +1,7 @@
 # ביחד · Beyachad
 
 A private, Hebrew-first wedding planner for two partners. Expo SDK 58, React Native,
-TypeScript and Expo Router. Version 0.1.0 is the foundation, not a finished wedding
+TypeScript and Expo Router. Version 0.2.0 includes task management, not a finished wedding
 management product.
 
 ## Run locally (Windows / macOS / Linux)
@@ -35,7 +35,8 @@ signing setup; no app was signed, uploaded or published by this deliverable.
 ## Real accounts and shared data
 
 1. Create a Supabase project in your own account.
-2. Run `supabase/migrations/202611030001_foundation.sql` once in its SQL editor.
+2. Run the SQL files in `supabase/migrations/` in filename order in its SQL editor.
+   Existing v0.1 installations need only `202611030002_task_management.sql`.
 3. Copy `.env.example` to `.env`. Set the project HTTPS URL and **publishable** key.
    Never use a service-role key or database password in the app.
 4. Keep email confirmation enabled; configure the public Site URL / confirmation
@@ -73,15 +74,17 @@ behavior still need physical-device acceptance testing.
 - Login, registration, password confirmation and verification guidance.
 - Persistent native sessions; development-only local auto-session.
 - Wedding creation, single-use partner invitation and tenant isolation SQL.
-- Home recommendations, task creation/completion, open-task filtering.
+- Home recommendations and upcoming tasks.
+- Full task creation, editing and confirmed deletion; stable partner assignment,
+  status, priority, category, due date, notes, search, filters and sorting.
 - Real-time task reloads and optimistic version checks to detect concurrent edits.
 - Five navigation tabs and settings; honest empty/future states for incomplete modules.
 - Loading, error and retry states; restrained stack transitions.
 
 ## Still to build
 
-Full budget/payments, guests/RSVP, supplier CRUD, documents, task deadlines and
-assignment, editable wedding details, reminders, seating, import/export, account
+Full budget/payments, guests/RSVP, supplier CRUD, documents,
+editable wedding details, reminders, seating, import/export, account
 deletion and password recovery. Do not publish for general use before recovery,
 deletion, privacy/support pages and production acceptance checks are complete.
 
@@ -95,7 +98,10 @@ npx expo install --check
 
 Core tests exercise release bypass protection, empty/default setup, date/budget
 validation, stable recommendation IDs, secure token chunking, interrupted writes
-and concurrent storage operations. CI runs typecheck, lint, tests and web export.
+and concurrent storage operations. Task tests cover assignment from both partner
+viewpoints, local data upgrades, deadline handling, combined filters and stale
+edits/deletions. PostgreSQL migration tests use PGlite to exercise constraints,
+RLS and column privileges against a minimal v0.1 schema fixture. CI runs typecheck, lint, tests and web export.
 Production export always disables development bypass. Release builds also have
 `__DEV__ === false`, independently preventing the bypass even with a bad flag.
 
