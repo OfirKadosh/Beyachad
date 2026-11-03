@@ -3,12 +3,14 @@ import type { GuestInvitation } from "../core/guests";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Wedding, Task } from "../core/domain";
 import type { FinanceState } from "../core/finance";
+import type { WeddingDocument } from "../core/documents";
 export const WORKSPACE_KEY = "beyachad.development.v1";
 export type LocalWorkspace = FinanceState & {
   wedding: Wedding | null;
   tasks: Task[];
   guests: GuestInvitation[];
   meetings: Meeting[];
+  documents: (WeddingDocument & { base64: string })[];
 };
 const empty = (): LocalWorkspace => ({
   wedding: null,
@@ -17,6 +19,7 @@ const empty = (): LocalWorkspace => ({
   payments: [],
   guests: [],
   meetings: [],
+  documents: [],
 });
 let queue: Promise<unknown> = Promise.resolve();
 export async function readWorkspace(): Promise<LocalWorkspace> {

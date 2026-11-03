@@ -1,3 +1,9 @@
+import {
+  updateWeddingDetails,
+  validateWeddingDetails,
+  weddingConflict,
+  type WeddingDetails,
+} from "../core/wedding";
 import { cancelDeviceReminders } from "../services/deviceReminders";
 import {
   createContext,
@@ -23,6 +29,7 @@ import {
 import { backend, requireBackend } from "../services/backend";
 import { useAuth } from "./AuthProvider";
 type Setup = Omit<Wedding, "id">;
+
 type Store = {
   wedding: Wedding | null;
   tasks: Task[];
@@ -31,6 +38,8 @@ type Store = {
   error: string;
   reload(): Promise<void>;
   createWedding(input: Setup): Promise<void>;
+  saveDetails(original: Wedding, input: WeddingDetails): Promise<void>;
+  leaveWedding(): Promise<void>;
   joinWedding(token: string): Promise<void>;
   addTask(title: string, recommendationKey?: string): Promise<void>;
   createTask(input: TaskDraft): Promise<void>;
@@ -68,7 +77,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
         const { data, error: e } = await db
           .from("weddings")
           .select(
-            "id, partner_one, partner_two, wedding_date, budget, budget_version",
+            "id, partner_one, partner_two, wedding_date, budget, budget_version, details_version",
           )
           .maybeSingle();
         if (e) throw e;
@@ -81,7 +90,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
                 .order("created_at"),
               db
                 .from("wedding_members")
-                .select("role")
+                .select("member_slot")
                 .eq("wedding_id", data.id)
                 .eq("user_id", userId)
                 .single(),
@@ -95,7 +104,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
         if (current !== generation.current) return;
         setWedding(data);
         setTasks((result.data ?? []).map(normalizeTask));
-        setViewerSlot(membership.data?.role === "partner" ? "two" : "one");
+        setViewerSlot(membership.data?.member_slot === "two" ? "two" : "one");
       }
       if (current === generation.current) setError("");
     } catch {
@@ -127,6 +136,20 @@ export function WeddingProvider({ children }: PropsWithChildren) {
           void reload();
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "weddings" },
+        () => {
+          void reload();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "wedding_members" },
+        () => {
+          void reload();
+        },
+      )
       .subscribe();
     return () => {
       void backend?.removeChannel(channel);
@@ -138,9 +161,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
       wedding:
         nextWedding && current.wedding?.id === nextWedding.id
           ? {
-              ...nextWedding,
-              budget: current.wedding.budget,
-              budget_version: current.wedding.budget_version,
+              ...current.wedding,
             }
           : nextWedding,
       tasks: nextTasks,
@@ -167,6 +188,45 @@ export function WeddingProvider({ children }: PropsWithChildren) {
       throw Error(
         "יצירת החתונה נכשלה. ודאו שהחשבון מאומת ושאין לכם חתונה קיימת.",
       );
+    await reload();
+  }
+  async function saveDetails(original: Wedding, input: WeddingDetails) {
+    const valid = validateWeddingDetails(input);
+    if (isDemo) {
+      const saved = await mutateWorkspace((current) => ({
+        ...current,
+        wedding: updateWeddingDetails(current.wedding, original, valid),
+      }));
+      generation.current++;
+      setWedding(saved.wedding);
+      return;
+    }
+    const { error: e } = await requireBackend().rpc("save_wedding_details", {
+      p_wedding_id: original.id,
+      p_version: original.details_version ?? 1,
+      p_one: valid.partner_one,
+      p_two: valid.partner_two,
+      p_date: valid.wedding_date,
+    });
+    if (e)
+      throw Error(
+        e.code === "40001"
+          ? weddingConflict
+          : "שמירת הפרטים נכשלה. בדקו חיבור ושדרוג נתונים 006.",
+      );
+    await reload();
+  }
+  async function leaveWedding() {
+    if (isDemo)
+      throw Error(
+        "עזיבת מרחב זמינה בחשבון אמיתי. לאיפוס הפיתוח השתמשו באיפוס הנתונים.",
+      );
+    const { error: e } = await requireBackend().rpc("leave_wedding");
+    if (e)
+      throw Error(
+        "לא ניתן לעזוב. אם אתם האחרונים במרחב, מחקו קודם את המסמכים ונסו שוב.",
+      );
+    await cancelDeviceReminders().catch(() => {});
     await reload();
   }
   async function joinWedding(token: string) {
@@ -289,6 +349,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
         payments: [],
         guests: [],
         meetings: [],
+        documents: [],
       }));
       generation.current++;
       setWedding(null);
@@ -305,6 +366,8 @@ export function WeddingProvider({ children }: PropsWithChildren) {
         error,
         reload,
         createWedding,
+        saveDetails,
+        leaveWedding,
         joinWedding,
         addTask,
         createTask,

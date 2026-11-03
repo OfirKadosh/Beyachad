@@ -17,6 +17,9 @@ import { devSession } from "../services/config";
 type Auth = {
   userId: string | null;
   ready: boolean;
+  recovering: boolean;
+  finishRecovery(): void;
+  beginRecovery(): void;
   locked: boolean;
   biometric: boolean;
   isDemo: boolean;
@@ -27,6 +30,7 @@ type Auth = {
 };
 const Context = createContext<Auth | null>(null);
 export function AuthProvider({ children }: PropsWithChildren) {
+  const [recovering, setRecovering] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(devSession || !backend);
   const [locked, setLocked] = useState(false);
@@ -75,6 +79,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
     }
     const subscription = backend.auth.onAuthStateChange((_event, next) => {
+      if (_event === "PASSWORD_RECOVERY") setRecovering(true);
+      if (_event === "SIGNED_OUT") setRecovering(false);
       void apply(next);
     });
     backend.auth
@@ -117,6 +123,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (userId && Platform.OS !== "web")
       await SecureStore.deleteItemAsync(`biometric.${userId}`);
     setSession(null);
+    setRecovering(false);
     setLocked(false);
     setEnabled(false);
     enabled.current = false;
@@ -164,6 +171,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
       value={{
         userId,
         ready,
+        recovering,
+        beginRecovery: () => setRecovering(true),
+        finishRecovery: () => setRecovering(false),
         locked,
         biometric,
         isDemo: devSession,

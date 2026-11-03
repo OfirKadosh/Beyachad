@@ -148,6 +148,18 @@ function Form({ vendorId, id }: { vendorId: string; id?: string }) {
         <Notice text={action.message} error />
       </Card>
       {original && (
+        <Button
+          title="מסמכים המשויכים לתשלום"
+          secondary
+          onPress={() =>
+            router.push({
+              pathname: "/documents",
+              params: { vendorId, paymentId: original.id },
+            })
+          }
+        />
+      )}
+      {original && (
         <Card>
           <Text style={styles.heading}>מחיקת הרישום</Text>
           <Text style={styles.muted}>

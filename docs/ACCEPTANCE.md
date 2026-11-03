@@ -24,7 +24,6 @@
 
 Apply `202611030002_task_management.sql` once to existing v0.1 databases first.
 
-
 1. Disable demo via `npm run start:auth`; sign up and verify email.
 2. Close/reopen the iOS app: the native session restores without password entry.
 3. Create wedding with account A; invite and join with account B on another device.
@@ -97,3 +96,23 @@ Apply migration 005 and rebuild the native development client.
 - Test sign-out/reset cancellation and biometric-lock retention of generic alerts.
 - Enable many reminders: only the closest 50 future requests are managed; no duplicates.
 - Remote changes while fully closed require reopening; this release has no server push.
+
+## Daily-use completion and visual refresh (v0.6)
+
+Apply migration 006 and deploy the document function before real-account checks.
+
+- Optional names/date remain blank on first use; editing them preserves budget/tasks.
+- Calendar-day countdown handles today/past dates and DST; stale details retain the draft.
+- Check teal/purple/peach surfaces, focus rings, button feedback and animated progress.
+- Enable reduced motion before launch and while open: screen/tab/press motion stops.
+- Upload valid PDF/PNG/JPEG, reject incorrect signatures/size, link to a vendor/payment.
+- Preview/reload/delete documents; unrelated accounts and anonymous users cannot download.
+- Verify failed registration cleanup, deletion retry and real Storage signed-link expiry.
+- Recover using emailed OTP, set new password, sign in again; invalid/expired OTP must fail.
+- A recovery session must never mount the planning data providers before completion/cancel.
+- Verify typed deletion confirmation and password verification; try failed reauthentication.
+- Leave as owner/partner: retain shared data, promote remaining owner, preserve assignment slots.
+- New invitation fills the vacant slot; revoked invites/access no longer work for a departing user.
+- Last-member departure requires document deletion; final account deletion removes Auth user.
+- Check native file picker/share, session/biometric behavior and local alerts on an iPhone.
+- Configure operator/support details and public privacy URL before store submission.

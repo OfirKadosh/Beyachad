@@ -1,3 +1,6 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import { daysUntil } from "../../core/wedding";
 import { useReminders } from "../../providers/ReminderProvider";
 import { useMeetings } from "../../providers/MeetingProvider";
 import { formatMeetingTime } from "../../core/meetingTime";
@@ -9,6 +12,8 @@ import { money } from "../../core/money";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import {
+  colors,
+  Progress,
   Button,
   Card,
   Notice,
@@ -43,6 +48,12 @@ export default function Home() {
     finance,
     wedding?.budget == null ? null : Math.round(wedding.budget * 100),
   );
+  const days = daysUntil(wedding?.wedding_date ?? null, new Date(now));
+  const done = tasks.filter((t) => t.completed).length;
+  const nextPayments = finance.payments
+    .filter((p) => !p.paid_date && p.due_date)
+    .sort((a, b) => a.due_date!.localeCompare(b.due_date!))
+    .slice(0, 2);
   const open = tasks.filter((t) => !t.completed);
   const upcoming = selectTasks(tasks, {
     filter: "open",
@@ -67,19 +78,110 @@ export default function Home() {
       {isDemo && (
         <Notice text="מצב פיתוח מחובר · שמירה מקומית · ללא סנכרון בין מכשירים" />
       )}
-      <Card hero>
-        <Text style={styles.heading}>
-          {wedding?.wedding_date
-            ? `נפגשים ב־${wedding.wedding_date}`
-            : "עוד לא קבעתם תאריך? יש זמן לתכנן."}
+      <LinearGradient
+        colors={["#087F79", "#315D87", "#7050B5"]}
+        start={{ x: 1, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ padding: 24, borderRadius: 28, gap: 14, overflow: "hidden" }}
+      >
+        <View
+          style={{
+            position: "absolute",
+            width: 180,
+            height: 180,
+            borderRadius: 90,
+            backgroundColor: "#FFFFFF0C",
+            left: -60,
+            top: -50,
+          }}
+          pointerEvents="none"
+        />
+        <View style={[styles.row, { justifyContent: "space-between" }]}>
+          <Text style={[styles.muted, { color: "#E5F5F2" }]}>
+            כל צעד קטן מקרב אתכם
+          </Text>
+          <Ionicons name="sparkles" color="#FFE0AB" size={25} />
+        </View>
+        <Text
+          style={{
+            fontSize: days === null ? 27 : 58,
+            fontWeight: "800",
+            color: "white",
+            textAlign: "right",
+          }}
+        >
+          {days === null
+            ? "היום שלכם בדרך"
+            : days > 0
+              ? days
+              : days === 0
+                ? "זה היום שלכם!"
+                : "איזה כיף, התחתנתם!"}
         </Text>
-        <Text style={styles.text}>
-          {open.length
-            ? `${open.length} משימות פתוחות בדרך ליום שלכם`
-            : "המרחב שלכם מוכן. מתחילים בצעד קטן."}
+        <Text style={[styles.text, { color: "white" }]}>
+          {days === null
+            ? "נבחר תאריך ונתחיל לספור ביחד."
+            : days > 0
+              ? "ימים עד שאומרים כן"
+              : days === 0
+                ? "מאחלים לכם יום מלא אהבה."
+                : "כל התכנון והזיכרונות נשארים כאן."}
         </Text>
-        <Button title="למשימות שלנו" onPress={() => router.push("/tasks")} />
-      </Card>
+        <Button
+          title={
+            wedding?.wedding_date
+              ? "עדכון פרטי החתונה"
+              : "בחירת תאריך ופרטי החתונה"
+          }
+          secondary
+          onPress={() => router.push("/wedding-details")}
+        />
+      </LinearGradient>
+      <View style={[styles.row, { alignItems: "stretch" }]}>
+        <View
+          style={{
+            flex: 1,
+            minWidth: 115,
+            backgroundColor: colors.lavender,
+            padding: 17,
+            borderRadius: 22,
+            gap: 6,
+          }}
+        >
+          <Ionicons name="checkmark-circle" color={colors.purple} size={24} />
+          <Text style={[styles.heading, { fontSize: 26 }]}>
+            {done}/{tasks.length}
+          </Text>
+          <Text style={styles.muted}>משימות הושלמו</Text>
+          <Progress
+            value={tasks.length ? done / tasks.length : 0}
+            label="התקדמות המשימות"
+            color={colors.purple}
+          />
+        </View>
+        <View
+          style={{
+            flex: 1,
+            minWidth: 115,
+            backgroundColor: colors.peach,
+            padding: 17,
+            borderRadius: 22,
+            gap: 6,
+          }}
+        >
+          <Ionicons name="people" color={colors.coral} size={24} />
+          <Text style={[styles.heading, { fontSize: 26 }]}>
+            {people.confirmed}
+          </Text>
+          <Text style={styles.muted}>יחגגו איתכם</Text>
+          <Progress
+            value={people.invited ? people.confirmed / people.invited : 0}
+            label="אישורי הגעה"
+            color={colors.coral}
+          />
+        </View>
+      </View>
+      <Button title="למשימות שלנו" onPress={() => router.push("/tasks")} />
       {!finance.loading && !finance.error && (
         <Card>
           <Text style={styles.heading}>הכסף שלנו בתמונה אחת</Text>
@@ -89,6 +191,28 @@ export default function Home() {
           <Text style={styles.muted}>
             נותר לתשלום: {money(budget.remaining)}
           </Text>
+          <Progress
+            value={budget.committed ? budget.paid / budget.committed : 0}
+            label="התקדמות התשלומים"
+          />
+          {nextPayments.map((p) => (
+            <View key={p.id} style={{ gap: 5 }}>
+              <Text style={styles.text}>
+                {p.label} · {money(p.amount_cents)}
+              </Text>
+              <Text style={styles.muted}>{formatDueDate(p.due_date)}</Text>
+              <Button
+                title={`פתיחת תשלום: ${p.label}`}
+                secondary
+                onPress={() =>
+                  router.push({
+                    pathname: "/payment-editor",
+                    params: { id: p.id, vendorId: p.vendor_id },
+                  })
+                }
+              />
+            </View>
+          ))}
           {budget.available !== null && budget.available < 0 && (
             <Notice
               text={`חריגה מיעד התקציב: ${money(-budget.available)}`}
@@ -168,6 +292,17 @@ export default function Home() {
           ))}
         </Card>
       )}
+      <Card>
+        <Text style={styles.heading}>כל המסמכים, במקום אחד</Text>
+        <Text style={styles.muted}>
+          חוזים, הצעות וקבלות — מסודרים ופרטיים לשניכם.
+        </Text>
+        <Button
+          title="למסמכים שלנו"
+          secondary
+          onPress={() => router.push("/documents")}
+        />
+      </Card>
       <Text accessibilityRole="header" style={styles.heading}>
         מומלץ להתחיל כאן
       </Text>

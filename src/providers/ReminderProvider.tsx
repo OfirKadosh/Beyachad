@@ -13,6 +13,8 @@ import { buildReminders, type ReminderItem } from "../core/reminders";
 import { deviceTimeZone } from "../core/meetingTime";
 import { deviceReminders } from "../services/deviceReminders";
 import { notificationAdapter } from "../services/notificationAdapter";
+import { useGuests } from "./GuestProvider";
+import { useDocuments } from "./DocumentProvider";
 import { useAuth } from "./AuthProvider";
 import { useWedding } from "./WeddingProvider";
 import { useFinance } from "./FinanceProvider";
@@ -32,6 +34,8 @@ type Store = {
 const Context = createContext<Store | null>(null);
 export function ReminderProvider({ children }: PropsWithChildren) {
   const { userId } = useAuth();
+  const { reload: reloadGuests } = useGuests();
+  const { reload: reloadDocuments } = useDocuments();
   const {
     wedding,
     tasks,
@@ -81,8 +85,20 @@ export function ReminderProvider({ children }: PropsWithChildren) {
   const refresh = useCallback(async () => {
     setNow(Date.now());
     setZone(deviceTimeZone());
-    await Promise.all([reloadWedding(), reloadFinance(), reloadMeetings()]);
-  }, [reloadWedding, reloadFinance, reloadMeetings]);
+    await Promise.all([
+      reloadWedding(),
+      reloadFinance(),
+      reloadMeetings(),
+      reloadGuests(),
+      reloadDocuments(),
+    ]);
+  }, [
+    reloadWedding,
+    reloadFinance,
+    reloadMeetings,
+    reloadGuests,
+    reloadDocuments,
+  ]);
   useEffect(() => {
     const listener = AppState.addEventListener("change", (state) => {
       if (state === "active") void refresh();

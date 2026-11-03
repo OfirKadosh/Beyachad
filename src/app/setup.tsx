@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { Text } from "react-native";
 import {
@@ -98,6 +99,11 @@ export default function Setup() {
         )}
         <Notice text={action.message} error />
       </Card>
+      <Button
+        title="החשבון שלי"
+        secondary
+        onPress={() => router.push("/account")}
+      />
       <Button
         title={
           joining ? "יצירת חתונה חדשה" : "יש לכם קוד? הצטרפות לחתונה קיימת"

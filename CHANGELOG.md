@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.0 — Color, motion and daily-use completion
+
+- Refresh all shared screens with teal/purple/peach, branded app assets, softer cards and focus states.
+- Add focus entrances, spring presses, progress animation and tab/stack transitions; respect reduced motion.
+- Editable wedding names/date, independent conflict versions, calendar-day countdown and Home payment shortcuts.
+- Private document uploads/preview/deletion with vendor/payment links, signature/size checks and a verified-token Edge Function.
+- Recovery OTP/password-update flow; recovery sessions cannot mount planning providers.
+- Typed departure/deletion confirmations, password check for deletion, stable member slots and shared-data retention.
+- Privacy/help screen, migration 006, full migration-chain lifecycle tests, document handler tests and release instructions.
+
+Requires migration 006, deployed document function, configured recovery email template
+and a rebuilt native client. Hosted and physical-device acceptance remain outstanding;
+this version is not a signed or published App Store release.
+
 ## 0.5.0 — Meetings and reminders
 
 - Zoned meeting CRUD, duration, supplier links, ownership, status and lead-time selection.

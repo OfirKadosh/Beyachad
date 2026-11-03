@@ -146,6 +146,15 @@ export function FinanceProvider({ children }: PropsWithChildren) {
       return {
         ...current,
         ...next,
+        documents: current.documents.map((d) => ({
+          ...d,
+          vendor_id: next.vendors.some((v) => v.id === d.vendor_id)
+            ? d.vendor_id
+            : null,
+          payment_id: next.payments.some((p) => p.id === d.payment_id)
+            ? d.payment_id
+            : null,
+        })),
         meetings: current.meetings.map((m) =>
           m.vendor_id && !next.vendors.some((v) => v.id === m.vendor_id)
             ? { ...m, vendor_id: null, version: m.version + 1 }

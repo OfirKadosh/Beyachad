@@ -1,8 +1,12 @@
 # ביחד · Beyachad
 
 A private, Hebrew-first wedding planner for two partners. Expo SDK 58, React Native,
-TypeScript and Expo Router. Version 0.5.0 includes tasks, budget, vendors, guest invitations, meetings and
-a personal reminder center. Native notification delivery still needs device acceptance.
+TypeScript and Expo Router. Version 0.6.0 adds a colorful shared design system,
+accessible motion, an editable wedding/countdown dashboard, private documents,
+password recovery and account departure/deletion to the existing planning modules.
+Native delivery, hosted integrations and signed iPhone distribution still need acceptance.
+
+![Home in the development preview](docs/screenshots/home-v06.png)
 
 ## Run locally (Windows / macOS / Linux)
 
@@ -37,7 +41,7 @@ signing setup; no app was signed, uploaded or published by this deliverable.
 1. Create a Supabase project in your own account.
 2. Run the SQL files in `supabase/migrations/` in filename order in its SQL editor.
    Existing installations run only migrations newer than those already applied.
-   v0.4 needs migration 005; older versions apply all missing migrations in order.
+   v0.5 needs migration 006; older versions apply all missing migrations in order.
 3. Copy `.env.example` to `.env`. Set the project HTTPS URL and **publishable** key.
    Never use a service-role key or database password in the app.
 4. Keep email confirmation enabled; configure the public Site URL / confirmation
@@ -45,7 +49,11 @@ signing setup; no app was signed, uploaded or published by this deliverable.
    then return to the app and sign in using their password.
 5. Run `npm run start:auth`. This disables the development session so you can test
    registration, sign-in, verification and session restoration.
-6. Account A creates a wedding. In Settings, create an invitation code. Account B
+6. Configure recovery emails to include the numeric `{{ .Token }}` in the Supabase
+   **Reset Password** email template. The app uses email + recovery OTP, then a new
+   password; it does not consume recovery links. Keep OTP expiry/rate limits enabled.
+7. Deploy the document function as described below before testing cloud uploads.
+8. Account A creates a wedding. In Settings, create an invitation code. Account B
    registers, signs in, selects Join wedding and enters the code. Each account can
    belong to one wedding, and each wedding has at most two accounts in this MVP.
 
@@ -75,7 +83,14 @@ behavior still need physical-device acceptance testing.
 - Login, registration, password confirmation and verification guidance.
 - Persistent native sessions; development-only local auto-session.
 - Wedding creation, single-use partner invitation and tenant isolation SQL.
-- Home recommendations and upcoming tasks.
+- Home recommendations, live calendar-day countdown, progress indicators, upcoming tasks,
+  meetings and payment shortcuts. Editable names/date use separate optimistic versions.
+- Teal/purple/peach theme, branded icon, focus states, screen entrances, press springs,
+  animated progress and tab/stack transitions; device/browser reduced-motion is respected.
+- Recovery-code flow, new-password confirmation, local sign-out after reset.
+- Explicitly confirmed departure/account deletion with shared-data retention and stable slots.
+- Private PDF/JPEG/PNG documents, supplier/payment links, previews and confirmed deletion.
+- Public privacy/help screen with release-operator details intentionally awaiting configuration.
 - Full task creation, editing and confirmed deletion; stable partner assignment,
   status, priority, category, due date, notes, search, filters and sorting.
 - Real-time task reloads and optimistic version checks to detect concurrent edits.
@@ -88,14 +103,52 @@ behavior still need physical-device acceptance testing.
   details, dietary notes and manual attendance tracking.
 - Search/filters, invitation versus person totals, paged cloud loading and private access.
 - Five functional navigation tabs plus protected editors and settings.
-- Loading, error and retry states; restrained stack transitions.
+- Loading, error and retry states; drafts remain on concurrent-edit conflicts.
 
-## Still to build
+## Private document service and account lifecycle
 
-Public RSVP links, document uploads, editable wedding names/date,
-reminders, seating, import/export, account
-deletion and password recovery. Do not publish for general use before recovery,
-deletion, privacy/support pages and production acceptance checks are complete.
+Apply migration 006 after all previous migrations. It creates the private
+`wedding-documents` bucket and metadata policies. Client keys can read only files
+registered to their wedding, through signed URLs expiring after 60 seconds.
+There is no client storage write/delete policy. Upload and removal go through:
+
+```sh
+npx supabase login
+npx supabase functions deploy documents --project-ref YOUR_PROJECT_REF --no-verify-jwt
+```
+
+The function explicitly verifies the Bearer token using Supabase Auth `getUser`,
+then verifies membership. `--no-verify-jwt` disables only the gateway check; the
+handler rejects missing/invalid authentication. Server-only `SUPABASE_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` are supplied by the Supabase hosted function runtime.
+Never copy the server key into Expo public variables. Uploads use the server
+identity so storage objects have no departing user's ownership. Registration locks
+and rechecks membership and linked supplier/payment in PostgreSQL. A failed
+registration attempts to remove the uploaded bytes; failed cleanup logs the path
+for operator cleanup. Removal deletes Storage bytes before metadata and is retryable.
+
+Files are limited to PDF, JPEG and PNG, 5 MiB each and 100 per wedding. Declared
+MIME types and signatures are checked in client and server. Metadata writes are
+service-only. In development, bytes stay in the local workspace (subject to local
+storage quota), and never upload to the cloud. Native local previews use the share
+sheet; Web previews use a sandboxed frame.
+
+Leaving transfers ownership to the remaining member **without changing their
+assignment slot**. Shared records and files remain with that member. The next
+invite fills the vacant slot. Last-member departure deletes the wedding only after
+all documents are removed through the app. Deleting an account also deletes its
+Auth user. The UI requires typed confirmation and password verification for account
+deletion; the RPC itself authorizes only the current authenticated account.
+Membership removal immediately denies database/storage access, including for a
+previously issued JWT. Already-issued signed document links last up to 60 seconds.
+
+## Before public distribution
+
+Complete [RELEASE-he.md](docs/RELEASE-he.md): provision your Supabase project,
+configure recovery email and deploy the document function, test with two accounts
+and physical iPhones, then configure your operator/support/privacy details and
+Apple/Expo signing. The app has not been published or signed here. Public RSVP
+links, seating, Excel import/export and guest messaging remain optional future scope.
 
 ## Checks
 

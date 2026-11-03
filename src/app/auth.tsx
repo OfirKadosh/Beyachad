@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { Text } from "react-native";
 import {
@@ -46,6 +47,16 @@ export default function AuthScreen() {
         "אם הכתובת זמינה להרשמה, יישלח אליה קישור אימות. לאחר האימות חזרו לכאן והתחברו.",
       );
   }
+  if (auth.recovering)
+    return (
+      <Screen>
+        <Title>מעדכנים את הסיסמה</Title>
+        <Button
+          title="להשלמת שחזור הסיסמה"
+          onPress={() => router.replace("/recovery")}
+        />
+      </Screen>
+    );
   if (auth.locked)
     return (
       <Screen>
@@ -124,6 +135,17 @@ export default function AuthScreen() {
           setPassword("");
           setConfirmation("");
         }}
+      />
+      <Button
+        title="שכחתם סיסמה?"
+        secondary
+        disabled={action.busy}
+        onPress={() => router.push("/recovery")}
+      />
+      <Button
+        title="פרטיות ועזרה"
+        secondary
+        onPress={() => router.push("/privacy")}
       />
       {!backendConfigured && (
         <Notice text="מסכי החשבונות מוכנים. להפעלתם יש לחבר את שירות החשבונות לפי README; אין התחברות מדומה בפרודקשן." />

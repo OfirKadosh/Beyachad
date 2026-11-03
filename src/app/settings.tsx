@@ -24,6 +24,29 @@ export default function Settings() {
       <Button title="חזרה לבית" secondary onPress={() => router.replace("/")} />
       <Title>הגדרות המרחב שלנו</Title>
       <Card>
+        <Text style={styles.heading}>המרחב, בדיוק שלכם</Text>
+        <Button
+          title="עריכת פרטי החתונה"
+          secondary
+          onPress={() => router.push("/wedding-details")}
+        />
+        <Button
+          title="מסמכים וחוזים"
+          secondary
+          onPress={() => router.push("/documents")}
+        />
+        <Button
+          title="ניהול החשבון והמרחב"
+          secondary
+          onPress={() => router.push("/account")}
+        />
+        <Button
+          title="פרטיות ועזרה"
+          secondary
+          onPress={() => router.push("/privacy")}
+        />
+      </Card>
+      <Card>
         <Text style={styles.heading}>גישה מהירה ובטוחה</Text>
         <Text style={styles.text}>
           התחברות נשמרת במכשיר. הזיהוי הביומטרי מוסיף נעילה מקומית בפתיחה ובחזרה
@@ -39,8 +62,8 @@ export default function Settings() {
           }}
         />
         <Text style={styles.muted}>
-          דורש חשבון אמיתי ומכשיר תומך. Face ID נבדק בבניית פיתוח ייעודית, ולא
-          בתצוגת הדפדפן.
+          דורש חשבון אמיתי ומכשיר תומך. לבדיקת Face ID נדרשת בניית פיתוח
+          ייעודית, מעבר ל־ בתצוגת הדפדפן.
         </Text>
       </Card>
       <Card>

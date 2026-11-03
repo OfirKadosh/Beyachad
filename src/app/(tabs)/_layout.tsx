@@ -1,5 +1,7 @@
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useReducedMotion } from "../../components/motion";
 import { colors } from "../../components/ui";
 const icons = {
   index: "home-outline",
@@ -9,15 +11,27 @@ const icons = {
   vendors: "briefcase-outline",
 } as const;
 export default function Layout() {
+  const reduced = useReducedMotion();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={({ route }) => ({
         headerShown: false,
+        animation: reduced ? "none" : "shift",
+        tabBarActiveBackgroundColor: colors.sage,
+        tabBarItemStyle: {
+          borderRadius: 16,
+          marginHorizontal: 3,
+          marginVertical: 0,
+        },
         tabBarActiveTintColor: colors.green,
         tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {
           backgroundColor: colors.paper,
           borderTopColor: colors.border,
+          height: 72 + insets.bottom,
+          paddingTop: 8,
+          paddingBottom: Math.max(insets.bottom, 8),
         },
         tabBarLabelStyle: { fontSize: 12 },
         tabBarIcon: ({ color, size }) => (

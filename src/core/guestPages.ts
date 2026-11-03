@@ -1,12 +1,14 @@
 import type { GuestInvitation } from "./guests";
 // Respect server row caps while keeping totals based on all visible invitations.
-export async function loadGuestPages(
+export async function loadGuestPages<
+  T extends { id: string } = GuestInvitation,
+>(
   fetchPage: (
     from: number,
     to: number,
-  ) => Promise<{ rows: GuestInvitation[]; count: number | null }>,
+  ) => Promise<{ rows: T[]; count: number | null }>,
 ) {
-  const found = new Map<string, GuestInvitation>();
+  const found = new Map<string, T>();
   let offset = 0;
   for (;;) {
     const { rows, count } = await fetchPage(offset, offset + 499);

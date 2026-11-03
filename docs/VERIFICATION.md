@@ -2,7 +2,7 @@
 
 Passed on the delivered source:
 
-- `npm run check`: TypeScript, Expo ESLint, 62 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
+- `npm run check`: TypeScript (app + server handler), Expo ESLint, 76 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
 - `npx expo install --check`: SDK-compatible dependencies.
 - `npm run export:web`: release web bundle generated successfully.
 - Chromium UI smoke: empty initial fields, generic wedding creation, recommendation
@@ -80,3 +80,30 @@ project dependency. Portable core tests and GitHub CI are included in the source
 - All 62 automated tests, TypeScript and lint passed. SDK dependency compatibility,
   production Web export and iOS JavaScript/Hermes export passed. The iOS export
   is not a signed native build or a physical-device delivery test.
+
+## v0.6 visual refresh and daily-use completion
+
+- All 76 tests, app/server TypeScript checks and Expo lint passed.
+- The full 001–006 SQL chain executes in PGlite with minimal Auth/Storage schemas
+  and deterministic extension stubs: independently versioned wedding details,
+  tenant-private document reads, server-only metadata registration, linked-vendor
+  validation/unlink, ownership transfer, stable member slots, re-invitation,
+  departure, final-member document guard and Auth-user deletion passed.
+- Document request-handler tests run with mocked Auth/Storage services: invalid
+  tokens and membership fail before storage, file headers/size are checked,
+  failed registration removes uploaded bytes, failed removal preserves retry metadata.
+- Binary base64 codec works without browser globals and matches Node's standard
+  encoder across chunk boundaries. Native file-picker/share behavior remains unverified.
+- Browser daily-use flow passed: generic setup, invalid date, details persistence,
+  stale-draft retention, task coexistence, Home payment shortcut, supplier/payment-linked
+  document upload, incorrect file rejection, image preview, reload and confirmed deletion.
+- Home/documents fit at 320 / 390 / 736 px. Both normal/reduced-motion preferences
+  were exercised; no runtime/console errors occurred in the final daily-use flow.
+- Mocked Auth browser flow passed recovery email/OTP/new-password/sign-out, prevention
+  of planning-provider loads during recovery, password verification before deletion,
+  and account deletion both with an existing wedding and before initial setup.
+  This does not verify hosted email delivery, Auth administration or cloud account cleanup.
+- Existing task, finance, guest and meeting browser regression flows passed.
+- Production Web export and iOS JavaScript/Hermes export passed. Signed native builds,
+  live Supabase/Storage/Edge integration, multi-device Realtime, biometrics and actual
+  iPhone notification delivery remain the release checks in RELEASE-he.md.

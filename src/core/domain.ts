@@ -6,6 +6,7 @@ export type Wedding = {
   wedding_date: string | null;
   budget: number | null;
   budget_version?: number;
+  details_version?: number;
 };
 export type Task = {
   id: string;

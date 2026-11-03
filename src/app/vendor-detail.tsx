@@ -97,6 +97,13 @@ function Detail() {
           />
         </Card>
       )}
+      <Button
+        title="מסמכי הספק"
+        secondary
+        onPress={() =>
+          router.push({ pathname: "/documents", params: { vendorId: id } })
+        }
+      />
       <Text style={styles.heading}>תשלומים ומקדמות</Text>
       {!entries.length && (
         <Text style={styles.muted}>
