@@ -1,3 +1,4 @@
+import { cancelDeviceReminders } from "../services/deviceReminders";
 import {
   createContext,
   useContext,
@@ -108,6 +109,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       throw Error(
         "במצב הפיתוח נשארים מחוברים. לבדיקת מסכי הכניסה יש להגדיר EXPO_PUBLIC_DEV_SESSION=false ולהפעיל מחדש.",
       );
+    await cancelDeviceReminders().catch(() => {});
     const { error: e } = await requireBackend().auth.signOut({
       scope: "local",
     });

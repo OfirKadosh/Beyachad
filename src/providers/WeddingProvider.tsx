@@ -1,3 +1,4 @@
+import { cancelDeviceReminders } from "../services/deviceReminders";
 import {
   createContext,
   useCallback,
@@ -279,6 +280,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
   }
   async function resetDemo() {
     if (!isDemo) throw Error("זמין בפיתוח בלבד.");
+    await cancelDeviceReminders().catch(() => {});
     await serialize(async () => {
       await mutateWorkspace(() => ({
         wedding: null,
@@ -286,6 +288,7 @@ export function WeddingProvider({ children }: PropsWithChildren) {
         vendors: [],
         payments: [],
         guests: [],
+        meetings: [],
       }));
       generation.current++;
       setWedding(null);

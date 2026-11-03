@@ -2,7 +2,7 @@
 
 Passed on the delivered source:
 
-- `npm run check`: TypeScript, Expo ESLint, 45 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
+- `npm run check`: TypeScript, Expo ESLint, 62 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
 - `npx expo install --check`: SDK-compatible dependencies.
 - `npm run export:web`: release web bundle generated successfully.
 - Chromium UI smoke: empty initial fields, generic wedding creation, recommendation
@@ -59,3 +59,24 @@ project dependency. Portable core tests and GitHub CI are included in the source
   status/side/group filters, duplicate phone advisory, Home summary, persistent coexistence
   with tasks/vendors, stale-draft preservation and confirmed deletion.
 - Guest list/editor fit at 320 / 390 / 736 px without runtime or console errors.
+
+## v0.5 meetings and reminders
+
+- Core and SQL tests: zoned UTC round-trip, DST gaps/repeats, meeting bounds,
+  participant-aware overlaps, idempotent creation, stale edits/deletes, private
+  tenant access and linked-vendor deletion preserving meeting history.
+- Fake adapter tests: no automatic permission prompts, future-only top-50 limits,
+  idempotent reconciliation, date replacement, source removal, account changes,
+  permission denial and sign-out invalidating an in-flight schedule.
+- Native adapter TypeScript validation is not proof of OS notification delivery.
+  Physical-device notification and live Supabase acceptance remain outstanding.
+- Browser flow passed: zoned meeting create/edit, missing DST hour rejection,
+  overlap warning, reminder navigation, task completion removal, vendor unlink,
+  stale-draft retention, cancellation/deletion and reload persistence.
+- Meeting list and editor fit at 320 / 390 / 736 px; cancelling an edit preserves
+  the list filter. No browser runtime or console errors were observed.
+- Task, finance and guest browser regression flows passed. Production export
+  rejects development-session bypasses and protects the new direct routes.
+- All 62 automated tests, TypeScript and lint passed. SDK dependency compatibility,
+  production Web export and iOS JavaScript/Hermes export passed. The iOS export
+  is not a signed native build or a physical-device delivery test.

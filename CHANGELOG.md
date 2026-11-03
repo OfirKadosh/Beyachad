@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 — Meetings and reminders
+
+- Zoned meeting CRUD, duration, supplier links, ownership, status and lead-time selection.
+- DST gap/repeated-time validation and participant-aware overlap advisories.
+- Personal reminder center combining meetings, task deadlines and unpaid installments.
+- Opt-in native local notifications with generic content, bounded scheduling and reconciliation.
+- Cleanup/version protection for supplier unlink, logout/reset and stale asynchronous schedules.
+- Add migration 005, meeting SQL/time-zone tests and fake-adapter notification tests.
+
+Requires a rebuilt native development client for expo-notifications. Web has an
+in-app list only. Real-device delivery and hosted background synchronization are
+not claimed; local schedules refresh on app open/foreground/live sync.
+
 ## 0.4.0 — Guest invitations and manual RSVP
 
 - Create/edit/delete invitations for families, couples or individuals.

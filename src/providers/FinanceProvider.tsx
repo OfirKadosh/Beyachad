@@ -142,7 +142,16 @@ export function FinanceProvider({ children }: PropsWithChildren) {
   async function local(change: (current: FinanceState) => FinanceState) {
     const next = await mutateWorkspace((current) => {
       if (current.wedding?.id !== weddingId) throw Error(financeConflict);
-      return { ...current, ...change(current) };
+      const next = change(current);
+      return {
+        ...current,
+        ...next,
+        meetings: current.meetings.map((m) =>
+          m.vendor_id && !next.vendors.some((v) => v.id === m.vendor_id)
+            ? { ...m, vendor_id: null, version: m.version + 1 }
+            : m,
+        ),
+      };
     });
     revision.current++;
     setState({ vendors: next.vendors, payments: next.payments });

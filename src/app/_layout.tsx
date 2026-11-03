@@ -1,3 +1,6 @@
+import { MeetingProvider } from "../providers/MeetingProvider";
+import { ReminderProvider } from "../providers/ReminderProvider";
+import { ReminderLifecycle } from "../components/ReminderLifecycle";
 import { GuestProvider } from "../providers/GuestProvider";
 import { FinanceProvider } from "../providers/FinanceProvider";
 import { Stack } from "expo-router";
@@ -44,6 +47,9 @@ function WeddingRoutes() {
         <Stack.Screen name="vendor-detail" />
         <Stack.Screen name="payment-editor" />
         <Stack.Screen name="guest-editor" />
+        <Stack.Screen name="meetings" />
+        <Stack.Screen name="meeting-editor" />
+        <Stack.Screen name="reminders" />
       </Stack.Protected>
     </Stack>
   );
@@ -64,6 +70,9 @@ function Routes() {
           <Stack.Screen name="vendor-detail" />
           <Stack.Screen name="payment-editor" />
           <Stack.Screen name="guest-editor" />
+          <Stack.Screen name="meetings" />
+          <Stack.Screen name="meeting-editor" />
+          <Stack.Screen name="reminders" />
         </Stack.Protected>
       </Stack>
     );
@@ -71,7 +80,11 @@ function Routes() {
     <WeddingProvider key={auth.userId}>
       <FinanceProvider>
         <GuestProvider>
-          <WeddingRoutes />
+          <MeetingProvider>
+            <ReminderProvider>
+              <WeddingRoutes />
+            </ReminderProvider>
+          </MeetingProvider>
         </GuestProvider>
       </FinanceProvider>
     </WeddingProvider>
@@ -82,6 +95,7 @@ export default function Root() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <AuthProvider>
+        <ReminderLifecycle />
         <Routes />
       </AuthProvider>
     </SafeAreaProvider>

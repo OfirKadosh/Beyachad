@@ -44,6 +44,14 @@ export default function Settings() {
         </Text>
       </Card>
       <Card>
+        <Text style={styles.heading}>פגישות ותזכורות</Text>
+        <Button
+          title="ניהול התזכורות במכשיר"
+          secondary
+          onPress={() => router.navigate("/reminders")}
+        />
+      </Card>
+      <Card>
         <Text style={styles.heading}>מתכננים בשניים</Text>
         <Text style={styles.muted}>
           מפיקים קוד חד־פעמי, שולחים לבן או בת הזוג, ומזינים אותו לאחר ההרשמה.

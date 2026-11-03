@@ -1,3 +1,6 @@
+import { useReminders } from "../../providers/ReminderProvider";
+import { useMeetings } from "../../providers/MeetingProvider";
+import { formatMeetingTime } from "../../core/meetingTime";
 import { useGuests } from "../../providers/GuestProvider";
 import { guestTotals } from "../../core/guests";
 import { useFinance } from "../../providers/FinanceProvider";
@@ -28,6 +31,12 @@ export default function Home() {
   const { isDemo } = useAuth();
   const action = useAction();
   const finance = useFinance();
+  const calendar = useMeetings();
+  const { now } = useReminders();
+  const nextMeetings = calendar.meetings
+    .filter((m) => m.status === "scheduled" && Date.parse(m.starts_at) >= now)
+    .sort((a, b) => a.starts_at.localeCompare(b.starts_at))
+    .slice(0, 2);
   const guests = useGuests();
   const people = guestTotals(guests.guests);
   const budget = budgetTotals(
@@ -109,6 +118,27 @@ export default function Home() {
           />
         </Card>
       )}
+      <Card>
+        <Text style={styles.heading}>הפגישות והתזכורות שלנו</Text>
+        <Button
+          title="לניהול הפגישות"
+          secondary
+          onPress={() => router.navigate("/meetings")}
+        />
+        <Button
+          title="לתזכורות שלי"
+          secondary
+          onPress={() => router.navigate("/reminders")}
+        />
+        {nextMeetings.map((m) => (
+          <View key={m.id}>
+            <Text style={styles.text}>{m.title}</Text>
+            <Text style={styles.muted}>
+              {formatMeetingTime(m.starts_at, m.time_zone)} · {m.time_zone}
+            </Text>
+          </View>
+        ))}
+      </Card>
       {upcoming.length > 0 && (
         <Card>
           <Text accessibilityRole="header" style={styles.heading}>

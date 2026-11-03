@@ -82,3 +82,18 @@ Apply migration 004 after the previous migrations.
 - Stale edits preserve the draft; delete requires confirmation and an up-to-date version.
 - Verify live create/update/delete synchronization on two devices and a list above 1,000 rows.
 - No guest-facing messages or links are sent by manual RSVP actions.
+
+## Meetings and native notification acceptance
+
+Apply migration 005 and rebuild the native development client.
+
+- Shared meeting create/edit/delete is visible on both accounts; stale changes fail.
+- Validate vendor unlink/version behavior without losing the meeting.
+- Test IANA zones, travel, DST boundaries, missing/repeated hours and date-only deadlines.
+- No permission prompt before explicit opt-in; denial/revocation keeps the in-app list usable.
+- On a physical iPhone test actual delivery in foreground/background, cold launch and lock.
+- Scheduled generic alerts contain no meeting titles, contact details, amounts or locations.
+- Completing/canceling/deleting a source removes its alert after synchronization.
+- Test sign-out/reset cancellation and biometric-lock retention of generic alerts.
+- Enable many reminders: only the closest 50 future requests are managed; no duplicates.
+- Remote changes while fully closed require reopening; this release has no server push.

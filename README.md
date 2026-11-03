@@ -1,8 +1,8 @@
 # ביחד · Beyachad
 
 A private, Hebrew-first wedding planner for two partners. Expo SDK 58, React Native,
-TypeScript and Expo Router. Version 0.4.0 includes tasks, budget, vendors and guest invitations with manual RSVP.
-Meetings, reminders and distribution acceptance remain on the roadmap.
+TypeScript and Expo Router. Version 0.5.0 includes tasks, budget, vendors, guest invitations, meetings and
+a personal reminder center. Native notification delivery still needs device acceptance.
 
 ## Run locally (Windows / macOS / Linux)
 
@@ -37,7 +37,7 @@ signing setup; no app was signed, uploaded or published by this deliverable.
 1. Create a Supabase project in your own account.
 2. Run the SQL files in `supabase/migrations/` in filename order in its SQL editor.
    Existing installations run only migrations newer than those already applied.
-   v0.3 needs migration 004; v0.2 needs 003 and 004; v0.1 needs 002–004.
+   v0.4 needs migration 005; older versions apply all missing migrations in order.
 3. Copy `.env.example` to `.env`. Set the project HTTPS URL and **publishable** key.
    Never use a service-role key or database password in the app.
 4. Keep email confirmation enabled; configure the public Site URL / confirmation
@@ -177,3 +177,36 @@ The remaining first-release work and later extras are listed in `docs/ROADMAP-he
 
 SDK 58 compatibility patches are aligned in v0.4. Rebuild an existing native
 development client before the physical-device acceptance pass.
+
+## Meetings and device reminders (v0.5)
+
+Apply migration 005 after 001–004. Local workspaces add an empty meetings array;
+existing tasks, guests, suppliers and payments remain intact. Meetings store a UTC
+instant plus an explicit IANA time zone, duration, responsible partner(s), optional
+supplier, status, location, notes and reminder lead time. Invalid or ambiguous wall
+times at DST transitions are rejected instead of silently shifted. Deleting a supplier
+unlinks its meeting and increments the meeting version; it does not delete history.
+
+The in-app reminder center covers active assigned/shared meetings and tasks, and
+shared unpaid installments. Date-only task/payment reminders use 09:00 in the
+current device time zone; meeting reminders use the selected lead time. Overdue
+items stay visible in-app. Past notification times are not delivered retroactively.
+
+Install a new native development build after adding expo-notifications. The user
+opts in on Reminders; no permission prompt is shown automatically. Web preview
+uses only the in-app list and never requests browser push permission. Notifications
+are local to this device, not server push, SMS, email or Calendar invitations.
+The closest 50 future reminders are scheduled. Edits/completion/cancellation remove
+or replace managed requests on sync, without touching other scheduled requests.
+Generic lock-screen content contains no titles, contacts, amounts or location.
+Logout/reset attempts to cancel managed requests; a biometric lock retains the
+session and its generic reminders. Generation checks prevent queued stale schedules
+from reappearing after logout. Permission revocation is surfaced rather than
+reported as successful scheduling.
+
+Keep the app open/reopen after changes on another device. Local reminders cannot
+learn about remote edits while the app is fully closed; server delivery is future
+work. Delivery is subject to OS permissions/settings and best-effort scheduling.
+Physical iPhone permission, foreground/background, cold-launch, lock, sign-out,
+clock/time-zone change and actual notification delivery still require acceptance.
+No APNs/Expo push token or server credentials are collected by this implementation.
