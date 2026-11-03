@@ -1,3 +1,6 @@
+import { useFinance } from "../../providers/FinanceProvider";
+import { budgetTotals } from "../../core/finance";
+import { money } from "../../core/money";
 import { router } from "expo-router";
 import { Text, View } from "react-native";
 import {
@@ -22,6 +25,11 @@ export default function Home() {
   const { wedding, tasks, viewerSlot, addTask } = useWedding();
   const { isDemo } = useAuth();
   const action = useAction();
+  const finance = useFinance();
+  const budget = budgetTotals(
+    finance,
+    wedding?.budget == null ? null : Math.round(wedding.budget * 100),
+  );
   const open = tasks.filter((t) => !t.completed);
   const upcoming = selectTasks(tasks, {
     filter: "open",
@@ -59,6 +67,28 @@ export default function Home() {
         </Text>
         <Button title="למשימות שלנו" onPress={() => router.push("/tasks")} />
       </Card>
+      {!finance.loading && !finance.error && (
+        <Card>
+          <Text style={styles.heading}>הכסף שלנו בתמונה אחת</Text>
+          <Text style={styles.text}>
+            התחייבנו: {money(budget.committed)} · שולם: {money(budget.paid)}
+          </Text>
+          <Text style={styles.muted}>
+            נותר לתשלום: {money(budget.remaining)}
+          </Text>
+          {budget.available !== null && budget.available < 0 && (
+            <Notice
+              text={`חריגה מיעד התקציב: ${money(-budget.available)}`}
+              error
+            />
+          )}
+          <Button
+            title="לפרטי התקציב"
+            secondary
+            onPress={() => router.navigate("/budget")}
+          />
+        </Card>
+      )}
       {upcoming.length > 0 && (
         <Card>
           <Text accessibilityRole="header" style={styles.heading}>

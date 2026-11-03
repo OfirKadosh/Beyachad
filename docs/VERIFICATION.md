@@ -2,7 +2,7 @@
 
 Passed on the delivered source:
 
-- `npm run check`: TypeScript, Expo ESLint, 18 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
+- `npm run check`: TypeScript, Expo ESLint, 32 tests, including core behavior, task rules and PostgreSQL migration/RLS checks.
 - `npx expo install --check`: SDK-compatible dependencies.
 - `npm run export:web`: release web bundle generated successfully.
 - Chromium UI smoke: empty initial fields, generic wedding creation, recommendation
@@ -34,3 +34,16 @@ project dependency. Portable core tests and GitHub CI are included in the source
   data upgrade, status/completed synchronization, column grants, RLS isolation,
   version checks and shared partner access passed. Hosted Realtime remains a
   separate staging check.
+
+## v0.3 budget and vendors
+
+- Vendor creation/editing/deletion, booking with agreed price and quote tracking.
+- Planned payment to paid uses one record; paid and planned allocations cannot exceed agreement.
+- Invalid price reduction and deletion with existing payment records are rejected.
+- Budget target edits and overdue/overrun summaries use integer-agora arithmetic.
+- Task writes preserve vendor/payment records and the updated target across reloads.
+- Stale vendor edits retain the typed draft; reset/delete actions require confirmation.
+- Browser checks at 320 / 390 / 736 px passed without runtime/console errors.
+- PGlite executes migration 003 against a baseline fixture and checks read RLS,
+  RPC membership, anonymous denial, direct-write denial, idempotency, versions and totals.
+  Hosted Realtime and physical-device tests remain separate checks.

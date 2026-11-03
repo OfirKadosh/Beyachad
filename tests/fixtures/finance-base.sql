@@ -1,0 +1,12 @@
+create role authenticated; create role anon;
+create schema private; create schema auth;
+create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+grant usage on schema auth,private to authenticated;
+create table public.weddings(id uuid primary key,budget numeric check(budget between 0 and 1000000000));
+create table public.wedding_members(wedding_id uuid references public.weddings,user_id uuid,role text);
+create function private.is_member(w uuid) returns boolean language sql stable security definer set search_path='' as $$ select exists(select 1 from public.wedding_members where wedding_id=w and user_id=auth.uid()) $$;
+alter table public.weddings enable row level security;
+create policy wedding_read on public.weddings for select to authenticated using(private.is_member(id));
+grant select on public.weddings to authenticated;
+insert into public.weddings values('00000000-0000-0000-0000-000000000001',1500),('00000000-0000-0000-0000-000000000002',2000);
+insert into public.wedding_members values('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000a','owner'),('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000b','partner'),('00000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-00000000000c','owner');

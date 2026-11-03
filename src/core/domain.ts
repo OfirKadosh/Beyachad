@@ -1,9 +1,11 @@
+import { parseMoney } from "./money";
 export type Wedding = {
   id: string;
   partner_one: string;
   partner_two: string;
   wedding_date: string | null;
   budget: number | null;
+  budget_version?: number;
 };
 export type Task = {
   id: string;
@@ -59,11 +61,8 @@ export function canUseDevSession(
   return isDev && environment === "development" && flag === "true";
 }
 export function parseBudget(value: string): number | null {
-  if (!value.trim()) return null;
-  const n = Number(value.replaceAll(",", ""));
-  if (!Number.isFinite(n) || n < 0 || n > 1_000_000_000)
-    throw Error("יש להזין תקציב תקין, מאפס ועד מיליארד שקלים.");
-  return n;
+  const cents = parseMoney(value);
+  return cents === null ? null : cents / 100;
 }
 export function parseDate(value: string): string | null {
   if (!value.trim()) return null;

@@ -7,7 +7,7 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { readWorkspace, mutateWorkspace } from "../services/workspace";
 import { type Task, type Wedding } from "../core/domain";
 import {
   conflictMessage,
@@ -39,7 +39,6 @@ type Store = {
   resetDemo(): Promise<void>;
 };
 const Context = createContext<Store | null>(null);
-const DEMO_KEY = "beyachad.development.v1";
 export function WeddingProvider({ children }: PropsWithChildren) {
   const { userId, isDemo } = useAuth();
   const [wedding, setWedding] = useState<Wedding | null>(null);
@@ -58,16 +57,18 @@ export function WeddingProvider({ children }: PropsWithChildren) {
     const current = ++generation.current;
     try {
       if (isDemo) {
-        const raw = await AsyncStorage.getItem(DEMO_KEY);
+        const workspace = await readWorkspace();
         if (current !== generation.current) return;
-        const data = raw ? JSON.parse(raw) : { wedding: null, tasks: [] };
+        const data = workspace;
         setWedding(data.wedding);
         setTasks(data.tasks.map(normalizeTask));
       } else if (userId) {
         const db = requireBackend();
         const { data, error: e } = await db
           .from("weddings")
-          .select("id, partner_one, partner_two, wedding_date, budget")
+          .select(
+            "id, partner_one, partner_two, wedding_date, budget, budget_version",
+          )
           .maybeSingle();
         if (e) throw e;
         const [result, membership] = data
@@ -131,17 +132,24 @@ export function WeddingProvider({ children }: PropsWithChildren) {
     };
   }, [isDemo, weddingId, reload]);
   async function saveDemo(nextWedding: Wedding | null, nextTasks: Task[]) {
-    await AsyncStorage.setItem(
-      DEMO_KEY,
-      JSON.stringify({ wedding: nextWedding, tasks: nextTasks }),
-    );
+    const saved = await mutateWorkspace((current) => ({
+      ...current,
+      wedding:
+        nextWedding && current.wedding?.id === nextWedding.id
+          ? {
+              ...nextWedding,
+              budget: current.wedding.budget,
+              budget_version: current.wedding.budget_version,
+            }
+          : nextWedding,
+      tasks: nextTasks,
+    }));
     generation.current++;
-    setWedding(nextWedding);
+    setWedding(saved.wedding);
     setTasks(nextTasks);
   }
   async function localTasks() {
-    const raw = await AsyncStorage.getItem(DEMO_KEY);
-    return raw ? (JSON.parse(raw).tasks as Task[]).map(normalizeTask) : [];
+    return (await readWorkspace()).tasks.map(normalizeTask);
   }
   async function createWedding(input: Setup) {
     if (isDemo)
@@ -272,7 +280,12 @@ export function WeddingProvider({ children }: PropsWithChildren) {
   async function resetDemo() {
     if (!isDemo) throw Error("זמין בפיתוח בלבד.");
     await serialize(async () => {
-      await AsyncStorage.removeItem(DEMO_KEY);
+      await mutateWorkspace(() => ({
+        wedding: null,
+        tasks: [],
+        vendors: [],
+        payments: [],
+      }));
       generation.current++;
       setWedding(null);
       setTasks([]);

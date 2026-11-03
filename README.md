@@ -1,8 +1,8 @@
 # ביחד · Beyachad
 
 A private, Hebrew-first wedding planner for two partners. Expo SDK 58, React Native,
-TypeScript and Expo Router. Version 0.2.0 includes task management, not a finished wedding
-management product.
+TypeScript and Expo Router. Version 0.3.0 includes tasks, budget and vendors.
+Guest management and the remaining planning modules are still to come.
 
 ## Run locally (Windows / macOS / Linux)
 
@@ -36,7 +36,8 @@ signing setup; no app was signed, uploaded or published by this deliverable.
 
 1. Create a Supabase project in your own account.
 2. Run the SQL files in `supabase/migrations/` in filename order in its SQL editor.
-   Existing v0.1 installations need only `202611030002_task_management.sql`.
+   Existing installations run only migrations newer than those already applied.
+   v0.2 needs `202611030003_budget_vendors.sql`; v0.1 needs migrations 002 and 003.
 3. Copy `.env.example` to `.env`. Set the project HTTPS URL and **publishable** key.
    Never use a service-role key or database password in the app.
 4. Keep email confirmation enabled; configure the public Site URL / confirmation
@@ -78,13 +79,18 @@ behavior still need physical-device acceptance testing.
 - Full task creation, editing and confirmed deletion; stable partner assignment,
   status, priority, category, due date, notes, search, filters and sorting.
 - Real-time task reloads and optimistic version checks to detect concurrent edits.
-- Five navigation tabs and settings; honest empty/future states for incomplete modules.
+- Vendor cards: category, contact, quote, agreed price, status and notes.
+- Budget target editing, commitments, paid totals, remaining/unallocated funds and overruns.
+- Scheduled and paid payment records, including deposits, edited in place without duplication.
+- Integer-agora arithmetic, stable operation IDs, transactional server validation and conflicts.
+- Shared local storage updates preserve task and finance data together.
+- Five navigation tabs and settings; guest management remains a future module.
 - Loading, error and retry states; restrained stack transitions.
 
 ## Still to build
 
-Full budget/payments, guests/RSVP, supplier CRUD, documents,
-editable wedding details, reminders, seating, import/export, account
+Guests/RSVP, document uploads, editable wedding names/date,
+reminders, seating, import/export, account
 deletion and password recovery. Do not publish for general use before recovery,
 deletion, privacy/support pages and production acceptance checks are complete.
 
@@ -126,3 +132,23 @@ The original ZIP also includes `beyachad-history.bundle` for offline restoration
 GitHub, replace its bundle-path origin with the canonical URL above.
 
 See `docs/ACCEPTANCE.md` for the next validation steps.
+
+## Finance upgrade (v0.3)
+
+Apply migration 003 before connecting this app version to an existing v0.2 backend.
+Fresh projects apply all three migrations in order. Development workspaces add
+empty vendor/payment arrays on load; there is no reset or deletion of existing tasks.
+Rebuild an installed development client after adding the native expo-crypto module.
+
+All prices/payment amounts are stored as integer agorot. Only booked suppliers'
+agreed prices count as commitments; unselected quotes are not added to the total.
+Planned and paid entries are the same records with a payment date, so marking paid
+never creates a second expense. Remaining to pay includes the scheduled portion.
+Price reductions and unbooking are blocked if they conflict with allocated payment
+records; a supplier with any payment records cannot be deleted until those records
+are handled explicitly. This is tracking only, not payment processing or bank access.
+
+Financial writes use membership-checked RPCs with vendor row locks and version
+checks. Stable UUIDs make create retries idempotent. Authenticated clients have
+read-only direct access to finance tables; all writes must use these RPCs.
+Offline full editing and hosted cross-device acceptance remain separate work.

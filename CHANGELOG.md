@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 — Budget and vendors
+
+- Create/edit/search vendor cards with contact details, category, quote, agreed cost and status.
+- Set a shared budget target and track commitments, paid amounts, remaining funds and overruns.
+- Record planned payments/deposits and mark them paid in place; edit/delete with confirmation.
+- Use integer agorot and idempotent creation IDs; transactional RPCs prevent over-allocation.
+- Protect supplier price/status changes, paid records, stale updates and tenant isolation.
+- Preserve tasks and finance records through one shared local-storage write queue.
+- Add SQL migration 003 and finance domain/permission tests.
+
+Existing Supabase projects must apply migration 003 after 002. Document uploads and
+RSVP management remain future stages. Rebuild existing native development clients
+for the newly added expo-crypto module.
+
 ## 0.2.0 — Task management
 
 - Create, edit and confirm deletion of shared tasks.

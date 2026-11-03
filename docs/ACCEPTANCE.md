@@ -56,3 +56,16 @@ Apply `202611030002_task_management.sql` once to existing v0.1 databases first.
 
 This checklist separates implemented foundation from tests requiring external
 accounts/devices. It does not claim these manual checks have already passed.
+
+## Budget and vendor acceptance
+
+Apply migration 003 after migration 002 on an existing Supabase backend.
+
+- Test one partner adding a booked vendor and the other seeing it in Budget.
+- Verify quotes do not count before booking, including multiple quotes for the same category.
+- Create a planned installment, mark it paid and confirm there is still one record.
+- Try simultaneous installments that together exceed the agreed price: one must fail.
+- Test retrying the same create after a network timeout: no duplicate entry.
+- Price/status changes and deletion must respect existing payment allocations.
+- An unrelated account must not read/write finance records or call RPCs for another wedding.
+- Rebuild an installed native development client to include expo-crypto.
