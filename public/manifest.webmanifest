@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "ביחד — תכנון החתונה שלכם",
+  "short_name": "ביחד",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F7F7FC",
+  "theme_color": "#087F79",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

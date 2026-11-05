@@ -3,20 +3,13 @@ import { createClient, processLock } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { sessionStorage, type KV } from "../core/chunkStorage";
+import { browserSessionStorage } from "../core/browserStorage";
 import { backendConfigured, backendKey, backendUrl } from "./config";
-const memory = new Map<string, string>();
-// Browser preview deliberately keeps tokens in memory only, never localStorage.
 const storage: KV =
   Platform.OS === "web"
-    ? {
-        getItem: async (k) => memory.get(k) ?? null,
-        setItem: async (k, v) => {
-          memory.set(k, v);
-        },
-        removeItem: async (k) => {
-          memory.delete(k);
-        },
-      }
+    ? browserSessionStorage(() =>
+        typeof window === "undefined" ? null : window.localStorage,
+      )
     : sessionStorage({
         getItem: (k) => SecureStore.getItemAsync(k),
         setItem: (k, v) =>
@@ -32,7 +25,7 @@ export const backend = backendConfigured
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: false,
-        lock: processLock,
+        ...(Platform.OS === "web" ? {} : { lock: processLock }),
       },
     })
   : null;

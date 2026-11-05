@@ -39,3 +39,14 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+# Shared web and native application
+
+- Maintain Expo web and native iOS as supported targets for every feature.
+- Share screens, domain rules, backend access, and validation; use platform files
+  only for browser/device capabilities that require separate implementations.
+- Run typecheck, lint, relevant tests, production web export and iOS JS export
+  for cross-platform changes. Report device/browser checks that remain manual.
+- Keep production demo sessions disabled. Never commit credentials or inject
+  database URLs, service-role keys or other secrets into client builds.
+- Keep docs/WEB-he.md platform limitations and deployment instructions current.

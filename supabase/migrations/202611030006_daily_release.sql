@@ -106,9 +106,17 @@ end; $$;
 revoke all on function public.leave_wedding(),public.delete_my_account() from public,anon;
 grant execute on function public.leave_wedding(),public.delete_my_account() to authenticated;
 
-do $$ begin
+-- Earlier migrations already publish weddings. Add only missing memberships.
+-- pg_publication_tables also covers FOR ALL TABLES / FOR TABLES IN SCHEMA.
+do $$
+declare target_table text;
+begin
  if exists(select 1 from pg_publication where pubname='supabase_realtime') then
-   alter publication supabase_realtime add table public.weddings,public.wedding_members,public.documents;
+   foreach target_table in array array['weddings','wedding_members','documents'] loop
+     if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename=target_table) then
+       execute format('alter publication supabase_realtime add table public.%I',target_table);
+     end if;
+   end loop;
  end if;
 end $$;
 commit;

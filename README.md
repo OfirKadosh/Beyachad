@@ -20,8 +20,8 @@ npm start
 `npm start` opens a **development-only, automatically connected local workspace**.
 It starts with empty names, no wedding date, no budget, and no tasks. The setup
 screen creates the workspace on this device. Recommendations can be added to tasks.
-`npm run web` opens the same code in a browser for quick UI review. This remains a
-React Native app; the browser is an additional development target.
+`npm run web` opens the same shared application in a browser for development.
+For production static hosting and iPhone home-screen setup, see [the web guide](docs/WEB-he.md).
 
 SDK 58 requires a compatible Expo client. If the App Store Expo Go build does not
 support it, use a development build. Face ID requires a native development build.
@@ -65,7 +65,7 @@ code uses the device share sheet when the user selects it.
 
 Native auth tokens are stored in SecureStore, with chunked generation-based writes
 to avoid large-value issues. Supabase refreshes access tokens using the refresh
-session. Browser preview sessions are memory-only. Passwords are never stored by
+session. Browser sessions persist in localStorage until sign-out or site-data removal. Passwords are never stored by
 the app. Development data uses a separate local AsyncStorage key and never syncs
 to the real backend.
 
@@ -114,13 +114,13 @@ There is no client storage write/delete policy. Upload and removal go through:
 
 ```sh
 npx supabase login
-npx supabase functions deploy documents --project-ref YOUR_PROJECT_REF --no-verify-jwt
+npx supabase functions deploy documents --project-ref YOUR_PROJECT_REF
 ```
 
-The function explicitly verifies the Bearer token using Supabase Auth `getUser`,
-then verifies membership. `--no-verify-jwt` disables only the gateway check; the
-handler rejects missing/invalid authentication. Server-only `SUPABASE_URL` and
-`SUPABASE_SERVICE_ROLE_KEY` are supplied by the Supabase hosted function runtime.
+Keep the platform JWT check enabled. The function also explicitly verifies the
+Bearer token using Supabase Auth `getUser`, then verifies wedding membership.
+Server-only `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are supplied by the
+Supabase hosted function runtime.
 Never copy the server key into Expo public variables. Uploads use the server
 identity so storage objects have no departing user's ownership. Registration locks
 and rechecks membership and linked supplier/payment in PostgreSQL. A failed
@@ -168,7 +168,7 @@ Check the resolved files and missing variable names without printing key values:
 
 ```sh
 npm run config:check
-npm run start:auth -- --web --clear
+node scripts/start.mjs --auth --web --clear
 ```
 
 The diagnostic follows Expo's development env-file precedence; pass

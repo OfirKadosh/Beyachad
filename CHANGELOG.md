@@ -2,6 +2,10 @@
 
 ## 0.6.1 — Explain disabled account buttons
 
+- Fix migration 006 Realtime publication setup when weddings is already published by migration 003; test the complete chain with a real publication.
+
+- Run config:check through the installed tsx loader so Node 22.15 can load its TypeScript helper.
+
 - Show missing/invalid Supabase configuration above the authentication form.
 - Accept the legacy EXPO_PUBLIC_SUPABASE_ANON_KEY alias and trim env values.
 - Validate HTTPS base URLs and reject modern server-secret keys in the client.
@@ -82,3 +86,9 @@ Full budget, guest and supplier management remain future stages.
 
 Generic wedding setup, auth/session infrastructure, development workspace,
 recommendations, simple tasks, partner invites and native biometric-lock foundation.
+
+## 0.7.0 — shared web and native deployment
+- Persist browser authentication across reloads and remove it on sign-out.
+- Add Hebrew standalone home-screen manifest and iPhone metadata to web exports.
+- Add Render static-site blueprint with production configuration and SPA rewrite.
+- Document shared web/iOS development and platform acceptance checks.

@@ -118,3 +118,22 @@ project dependency. Portable core tests and GitHub CI are included in the source
 - Diagnostic tests verify env precedence, absent/invalid URLs, empty keys, legacy-key
   fallback, disabled dotenv loading, Windows .env.txt hints and value-free output.
 - These checks do not verify the user's local env file or a live signup request.
+
+
+## v0.7.0 web release verification — 2026-11-05
+
+- TypeScript (app and Edge function), ESLint and 83 automated tests passed.
+- Production web export and exported manifest/icon/entry-script checks passed.
+- Chromium production smoke test with mocked Supabase: login, reload, tab close
+  and reopen, protected deep links, cross-tab sign-out, and widths 320, 390,
+  736 and 1280 passed with no runtime errors. This does not establish live
+  Supabase or Safari behavior for this release.
+- Browser persistence tests cover client recreation, sign-out removal, blocked
+  storage, quota failure and session removal by another tab.
+- iOS JavaScript/Hermes export passed; this is not a signed device build.
+- The CI workflow now exports both web and iOS JavaScript on future changes.
+- Render deployment, Safari home-screen installation, device file picking and
+  real two-account web/native synchronization remain post-deployment checks.
+- No production database changes were made for this web release. Migration 006
+  source includes the duplicate-publication fix already applied to the live DB;
+  do not rerun completed migrations.

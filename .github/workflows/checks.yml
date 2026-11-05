@@ -14,3 +14,5 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run export:web
+      - run: node scripts/verify-web.mjs
+      - run: npx expo export --platform ios --output-dir dist-ios

@@ -28,10 +28,10 @@
 
 ```sh
 npx supabase login
-npx supabase functions deploy documents --project-ref YOUR_PROJECT_REF --no-verify-jwt
+npx supabase functions deploy documents --project-ref YOUR_PROJECT_REF
 ```
 
-הפונקציה בודקת את טוקן הכניסה מול Auth בעצמה, גם כשבדיקת השער כבויה.
+משאירים את בדיקת JWT של השער פעילה. הפונקציה בודקת את טוקן הכניסה גם מול Auth ומוודאת חברות במרחב.
 Supabase מספק לשרת את `SUPABASE_URL` ואת `SUPABASE_SERVICE_ROLE_KEY`.
 הם אינם משתנים ציבוריים באפליקציה.
 

@@ -16,7 +16,7 @@ test("full migration chain: shared details, document isolation, ownership and ac
   const scalar = async <T>(sql: string, args: unknown[] = []) =>
     Object.values((await db.query(sql, args)).rows[0] as object)[0] as T;
   try {
-    await db.exec(`create role authenticated;create role anon;create role service_role bypassrls;create schema auth;create schema extensions;create schema storage;
+    await db.exec(`create role authenticated;create role anon;create role service_role bypassrls;create publication supabase_realtime;create schema auth;create schema extensions;create schema storage;
  create table auth.users(id uuid primary key);
  create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
  grant usage on schema auth,storage to authenticated,service_role;
@@ -33,6 +33,11 @@ test("full migration chain: shared details, document isolation, ownership and ac
       );
       await db.exec(sql);
     }
+    const published = await db.query<{ tablename: string }>(
+      "select tablename from pg_publication_tables where pubname='supabase_realtime' and schemaname='public'",
+    );
+    for (const table of ["weddings", "wedding_members", "documents"])
+      assert.ok(published.rows.some((row) => row.tablename === table));
     await as(a);
     const w = await scalar<string>(
       `select create_wedding('','','2027-01-04',1000)`,

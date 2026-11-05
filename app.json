@@ -2,7 +2,7 @@
   "expo": {
     "name": "ביחד",
     "slug": "beyachad-wedding",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": [
       "expo-router",
