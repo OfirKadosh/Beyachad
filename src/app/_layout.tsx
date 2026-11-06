@@ -50,6 +50,7 @@ function WeddingRoutes() {
         <Stack.Screen name="vendor-detail" />
         <Stack.Screen name="payment-editor" />
         <Stack.Screen name="guest-editor" />
+        <Stack.Screen name="guest-transfer" />
         <Stack.Screen name="meetings" />
         <Stack.Screen name="meeting-editor" />
         <Stack.Screen name="reminders" />
@@ -80,6 +81,7 @@ function Routes() {
           <Stack.Screen name="vendor-detail" />
           <Stack.Screen name="payment-editor" />
           <Stack.Screen name="guest-editor" />
+          <Stack.Screen name="guest-transfer" />
           <Stack.Screen name="meetings" />
           <Stack.Screen name="meeting-editor" />
           <Stack.Screen name="reminders" />

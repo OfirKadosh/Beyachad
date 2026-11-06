@@ -1,3 +1,8 @@
+import {
+  runGuestImport,
+  type ImportEntry,
+  type ImportResult,
+} from "../core/guestTransfer";
 import { loadGuestPages } from "../core/guestPages";
 import {
   createContext,
@@ -20,6 +25,31 @@ import { backend, requireBackend } from "../services/backend";
 import { mutateWorkspace, readWorkspace } from "../services/workspace";
 import { useAuth } from "./AuthProvider";
 import { useWedding } from "./WeddingProvider";
+
+function guestArgs(
+  id: string,
+  weddingId: string,
+  original: GuestInvitation | null,
+  valid: GuestDraft,
+) {
+  return {
+    p_id: id,
+    p_wedding_id: weddingId,
+    p_expected_version: original?.version ?? null,
+    p_name: valid.name,
+    p_contact: valid.contact,
+    p_phone: valid.phone,
+    p_side: valid.side,
+    p_group_name: valid.group_name,
+    p_invited_adults: valid.invited_adults,
+    p_invited_children: valid.invited_children,
+    p_rsvp: valid.rsvp,
+    p_confirmed_adults: valid.confirmed_adults,
+    p_confirmed_children: valid.confirmed_children,
+    p_dietary: valid.dietary,
+    p_notes: valid.notes,
+  };
+}
 type Store = {
   guests: GuestInvitation[];
   loading: boolean;
@@ -31,6 +61,10 @@ type Store = {
     draft: GuestDraft,
   ): Promise<void>;
   deleteGuest(original: GuestInvitation): Promise<void>;
+  importGuests(
+    entries: ImportEntry[],
+    report: (result: ImportResult) => void,
+  ): Promise<void>;
 };
 const Context = createContext<Store | null>(null);
 export function GuestProvider({ children }: PropsWithChildren) {
@@ -42,30 +76,36 @@ export function GuestProvider({ children }: PropsWithChildren) {
   const [error, setError] = useState("");
   const revision = useRef(0);
   const knownIds = useRef(new Set<string>());
+  const importBusy = useRef(false);
+  const scope = useRef(0);
+  useEffect(() => {
+    const generation = ++scope.current;
+    return () => {
+      scope.current = generation + 1;
+    };
+  }, [weddingId, isDemo]);
+  const readCurrent = useCallback(async (): Promise<GuestInvitation[]> => {
+    if (!weddingId) return [];
+    if (isDemo) return (await readWorkspace()).guests;
+    return loadGuestPages(async (from, to) => {
+      const {
+        data,
+        count,
+        error: e,
+      } = await requireBackend()
+        .from("guest_invitations")
+        .select("*", { count: "exact" })
+        .eq("wedding_id", weddingId)
+        .order("id")
+        .range(from, to);
+      if (e) throw e;
+      return { rows: data ?? [], count };
+    });
+  }, [isDemo, weddingId]);
   const reload = useCallback(async () => {
     const request = ++revision.current;
     try {
-      let next: GuestInvitation[];
-      if (!weddingId) {
-        await Promise.resolve();
-        next = [];
-      } else if (isDemo) next = (await readWorkspace()).guests;
-      else {
-        next = await loadGuestPages(async (from, to) => {
-          const {
-            data,
-            count,
-            error: e,
-          } = await requireBackend()
-            .from("guest_invitations")
-            .select("*", { count: "exact" })
-            .eq("wedding_id", weddingId)
-            .order("id")
-            .range(from, to);
-          if (e) throw e;
-          return { rows: data ?? [], count };
-        });
-      }
+      const next = await readCurrent();
       if (request === revision.current) {
         setGuests(next);
         knownIds.current = new Set(next.map((g) => g.id));
@@ -81,7 +121,7 @@ export function GuestProvider({ children }: PropsWithChildren) {
     } finally {
       if (request === revision.current) setLoading(false);
     }
-  }, [isDemo, weddingId]);
+  }, [readCurrent]);
   const invalidate = useCallback(() => {
     revision.current++;
   }, []);
@@ -104,7 +144,7 @@ export function GuestProvider({ children }: PropsWithChildren) {
           filter: `wedding_id=eq.${weddingId}`,
         },
         () => {
-          void reload();
+          if (!importBusy.current) void reload();
         },
       )
       .on(
@@ -116,18 +156,19 @@ export function GuestProvider({ children }: PropsWithChildren) {
           filter: `wedding_id=eq.${weddingId}`,
         },
         () => {
-          void reload();
+          if (!importBusy.current) void reload();
         },
       )
       .on(
         "postgres_changes",
         { event: "DELETE", schema: "public", table: "guest_invitations" },
         (event) => {
-          if (knownIds.current.has(String(event.old.id))) void reload();
+          if (knownIds.current.has(String(event.old.id)))
+            if (!importBusy.current) void reload();
         },
       );
     channel.subscribe((status) => {
-      if (status === "SUBSCRIBED") void reload();
+      if (status === "SUBSCRIBED") if (!importBusy.current) void reload();
     });
     return () => {
       void backend?.removeChannel(channel);
@@ -144,7 +185,11 @@ export function GuestProvider({ children }: PropsWithChildren) {
     knownIds.current = new Set(saved.guests.map((g) => g.id));
     setGuests(saved.guests);
   }
-  async function rpc(name: string, args: Record<string, unknown>) {
+  async function rpc(
+    name: string,
+    args: Record<string, unknown>,
+    refresh = true,
+  ) {
     const { error: e } = await requireBackend().rpc(name, args);
     if (e) {
       if (e.code === "40001") throw Error(guestConflict);
@@ -153,7 +198,7 @@ export function GuestProvider({ children }: PropsWithChildren) {
         "לא ניתן לשמור את ההזמנה. בדקו את הנתונים ואת שדרוג מסד הנתונים.",
       );
     }
-    if (!(await reload()))
+    if (refresh && !(await reload()))
       throw Error(
         "השמירה התקבלה אך הרענון נכשל. רעננו לפני הוספת הזמנה נוספת.",
       );
@@ -184,25 +229,43 @@ export function GuestProvider({ children }: PropsWithChildren) {
             valid,
           ),
         );
-      else
-        await rpc("save_guest", {
-          p_id: id,
-          p_wedding_id: weddingId,
-          p_expected_version: original?.version ?? null,
-          p_name: valid.name,
-          p_contact: valid.contact,
-          p_phone: valid.phone,
-          p_side: valid.side,
-          p_group_name: valid.group_name,
-          p_invited_adults: valid.invited_adults,
-          p_invited_children: valid.invited_children,
-          p_rsvp: valid.rsvp,
-          p_confirmed_adults: valid.confirmed_adults,
-          p_confirmed_children: valid.confirmed_children,
-          p_dietary: valid.dietary,
-          p_notes: valid.notes,
-        });
+      else await rpc("save_guest", guestArgs(id, weddingId, original, valid));
     });
+  }
+  async function importGuests(
+    entries: ImportEntry[],
+    report: (result: ImportResult) => void,
+  ) {
+    if (!weddingId) throw Error("יש להגדיר חתונה תחילה.");
+    if (importBusy.current) throw Error("ייבוא כבר מתבצע. המתינו לסיום.");
+    if (entries.length > 500) throw Error("ניתן לייבא עד 500 הזמנות בכל פעם.");
+    importBusy.current = true;
+    const started = scope.current;
+    try {
+      const current = await readCurrent();
+      await runGuestImport(
+        entries,
+        current,
+        async ({ id, draft }) => {
+          if (scope.current !== started)
+            throw Error("המרחב השתנה. הייבוא נעצר.");
+          if (isDemo)
+            await local((rows) =>
+              saveGuestState(rows, id, weddingId, null, draft),
+            );
+          else
+            await rpc(
+              "save_guest",
+              guestArgs(id, weddingId, null, draft),
+              false,
+            );
+        },
+        report,
+      );
+    } finally {
+      importBusy.current = false;
+      if (scope.current === started) await reload();
+    }
   }
   async function deleteGuest(original: GuestInvitation) {
     await safely(async () => {
@@ -216,7 +279,15 @@ export function GuestProvider({ children }: PropsWithChildren) {
   }
   return (
     <Context.Provider
-      value={{ guests, loading, error, reload, saveGuest, deleteGuest }}
+      value={{
+        guests,
+        loading,
+        error,
+        reload,
+        saveGuest,
+        deleteGuest,
+        importGuests,
+      }}
     >
       {children}
     </Context.Provider>

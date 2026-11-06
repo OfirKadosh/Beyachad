@@ -137,3 +137,23 @@ project dependency. Portable core tests and GitHub CI are included in the source
 - No production database changes were made for this web release. Migration 006
   source includes the duplicate-publication fix already applied to the live DB;
   do not rerun completed migrations.
+
+## v0.8.0 guest file transfer
+
+- Unit tests exercise XLSX/CSV round trips with Hebrew, quotes, commas, newlines,
+  leading zeroes, RSVP counts, header mapping, defaults, duplicate normalization,
+  invalid values, file/range limits, formulas, malformed CSV, UTF-8 fallback and
+  interrupted stable-ID retries that preserve remote edits.
+- Chromium development smoke test: file picker, preview before any writes,
+  manual exclusion, invalid/duplicate skipping, only approved rows eligible for
+  retry, XLSX/CSV downloads, duplicate re-import, multiple-sheet selection with custom
+  header mapping, filtered export and layouts at
+  320/390/736/1280 px passed without runtime errors. It used local demo storage.
+- Native device file picking/sharing and live two-account synchronization still
+  require post-deployment device checks. No live records were imported by tests.
+
+- Release checks: all 93 tests, app/Edge TypeScript, ESLint, web export and iOS
+  JavaScript/Hermes export passed. Device runtime sharing remains unverified.
+- An additional mocked-cloud UI test committed a row but returned an error,
+  then failed the list reload. The transfer screen retained its IDs and preview;
+  after refresh/retry only the remaining row was created, with no duplicate write.

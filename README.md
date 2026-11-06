@@ -289,3 +289,14 @@ work. Delivery is subject to OS permissions/settings and best-effort scheduling.
 Physical iPhone permission, foreground/background, cold-launch, lock, sign-out,
 clock/time-zone change and actual notification delivery still require acceptance.
 No APNs/Expo push token or server credentials are collected by this implementation.
+
+### Guest spreadsheets (v0.8.0)
+
+Open Guests → Import/export. XLSX and UTF-8 CSV support shared preview,
+column mapping, row exclusion, validation, duplicate skipping and additive
+imports up to 500 invitations / 5 MB. Export all or the active guest filter,
+or download an empty template. See [usage and limitations](docs/WEB-he.md).
+SheetJS is pinned to the vendor's official 0.20.3 tarball.
+Web downloads and native file sharing use platform adapters; no schema upgrade
+or additional paid service is required. Existing native builds need rebuilding
+if expo-sharing is not already included in the client.

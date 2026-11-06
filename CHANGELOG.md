@@ -92,3 +92,15 @@ recommendations, simple tasks, partner invites and native biometric-lock foundat
 - Add Hebrew standalone home-screen manifest and iPhone metadata to web exports.
 - Add Render static-site blueprint with production configuration and SPA rewrite.
 - Document shared web/iOS development and platform acceptance checks.
+
+## 0.8.0 — guest import and export
+- Add shared XLSX/UTF-8 CSV import with sheet selection, Hebrew/English column
+  mapping, validation, preview and explicit row exclusion/confirmation.
+- Skip likely duplicates by normalized phone or invitation name+side, including
+  another device's entries loaded immediately before the import.
+- Keep stable IDs across interrupted retries; preserve existing records and
+  report partial progress. Imports add invitations and never update existing ones.
+- Export all or filtered invitations and empty templates to XLSX/CSV.
+- Keep XLSX phone cells as text and escape CSV formula prefixes.
+- Download files in browsers and use the native share sheet on supported devices.
+- No database migration is needed.

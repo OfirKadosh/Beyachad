@@ -2,7 +2,7 @@
   "expo": {
     "name": "ביחד",
     "slug": "beyachad-wedding",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,7 +32,8 @@
           "faceIDPermission": "אפשרו זיהוי פנים כדי לפתוח את מרחב החתונה שלכם."
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-sharing"
     ],
     "scheme": "beyachad"
   }

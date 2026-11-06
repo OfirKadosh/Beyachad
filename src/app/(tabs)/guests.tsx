@@ -70,6 +70,16 @@ function List() {
         title="הוספת הזמנה"
         onPress={() => router.push("/guest-editor")}
       />
+      <Button
+        title="ייבוא וייצוא מוזמנים"
+        secondary
+        onPress={() =>
+          router.push({
+            pathname: "/guest-transfer",
+            params: { query, rsvp, side, group },
+          })
+        }
+      />
       <Field
         label="חיפוש מוזמנים"
         value={query}
