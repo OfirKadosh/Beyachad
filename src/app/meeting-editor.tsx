@@ -1,3 +1,4 @@
+import { DateField } from "../components/DateField";
 import { useState } from "react";
 import { Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -133,14 +134,13 @@ function Form({ id, fromList }: { id?: string; fromList?: string }) {
           maxLength={100}
           editable={!action.busy}
         />
-        <Field
+        <DateField
           label="תאריך הפגישה"
           value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-          autoCapitalize="none"
-          maxLength={10}
-          editable={!action.busy}
+          onChange={setDate}
+          disabled={action.busy}
+          minYear={1900}
+          maxYear={2200}
         />
         <Field
           label="שעת הפגישה"

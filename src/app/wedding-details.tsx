@@ -1,3 +1,4 @@
+import { DateField } from "../components/DateField";
 import { useState } from "react";
 import { Text } from "react-native";
 import { router } from "expo-router";
@@ -45,13 +46,12 @@ export default function WeddingDetails() {
           onChangeText={setTwo}
           maxLength={60}
         />
-        <Field
+        <DateField
           label="תאריך החתונה — רשות"
           value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-          maxLength={10}
-          autoCapitalize="none"
+          onChange={setDate}
+          disabled={action.busy}
+          optional
         />
         <Button
           title="שמירת פרטי החתונה"

@@ -52,6 +52,18 @@ function Form({ id }: { id?: string }) {
       String(original?.confirmed_children ?? 0),
     );
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [newGroup, setNewGroup] = useState(false);
+  const groups = [
+    ...new Set(
+      [
+        "משפחה",
+        "חברים",
+        "עבודה",
+        ...store.guests.map((guest) => guest.group_name),
+        original?.group_name ?? "",
+      ].filter(Boolean),
+    ),
+  ];
   const changed =
     !!original &&
     store.guests.find((g) => g.id === id)?.version !== original.version;
@@ -139,14 +151,32 @@ function Form({ id }: { id?: string }) {
           onChange={(v) => update("side", v)}
           disabled={action.busy}
         />
-        <Field
+        <Choice
           label="קבוצה — רשות"
-          value={draft.group_name}
-          onChangeText={(v) => update("group_name", v)}
-          placeholder="משפחה, חברים, עבודה..."
-          maxLength={50}
-          editable={!action.busy}
+          value={newGroup ? "new" : `group:${draft.group_name}`}
+          options={[
+            { value: "group:", label: "ללא קבוצה" },
+            ...groups.map((group) => ({
+              value: `group:${group}`,
+              label: group,
+            })),
+            { value: "new", label: "קבוצה חדשה" },
+          ]}
+          onChange={(value) => {
+            setNewGroup(value === "new");
+            update("group_name", value === "new" ? "" : value.slice(6));
+          }}
+          disabled={action.busy}
         />
+        {newGroup && (
+          <Field
+            label="שם הקבוצה החדשה"
+            value={draft.group_name}
+            onChangeText={(value) => update("group_name", value)}
+            maxLength={50}
+            editable={!action.busy}
+          />
+        )}
         <Field
           label="מבוגרים מוזמנים"
           value={adults}
@@ -225,6 +255,8 @@ function Form({ id }: { id?: string }) {
           busy={action.busy}
           onPress={() => {
             void action.run(async () => {
+              if (newGroup && !draft.group_name.trim())
+                throw Error("יש להזין שם לקבוצה החדשה או לבחור קבוצה קיימת.");
               await store.saveGuest(writeId, original, {
                 ...draft,
                 invited_adults: parseCount(adults),

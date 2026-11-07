@@ -1,3 +1,4 @@
+import { DateField } from "../components/DateField";
 import { useState } from "react";
 import { Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -109,22 +110,19 @@ function Form({ vendorId, id }: { vendorId: string; id?: string }) {
           ]}
           onChange={setMode}
         />
-        <Field
+        <DateField
           label="מועד מתוכנן"
           value={due}
-          onChangeText={setDue}
-          placeholder="YYYY-MM-DD"
-          autoCapitalize="none"
-          maxLength={10}
+          onChange={setDue}
+          disabled={action.busy}
+          optional
         />
         {mode === "paid" && (
-          <Field
+          <DateField
             label="תאריך ששולם"
             value={paid}
-            onChangeText={setPaid}
-            placeholder="YYYY-MM-DD"
-            autoCapitalize="none"
-            maxLength={10}
+            onChange={setPaid}
+            disabled={action.busy}
           />
         )}
         <Button

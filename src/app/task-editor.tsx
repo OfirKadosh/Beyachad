@@ -1,3 +1,4 @@
+import { DateField } from "../components/DateField";
 import { useState } from "react";
 import { Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -131,14 +132,12 @@ function Editor({ id }: { id?: string }) {
           onChange={(v) => update("category", v)}
           disabled={action.busy}
         />
-        <Field
+        <DateField
           label="תאריך יעד — רשות"
           value={draft.due_date ?? ""}
-          placeholder="YYYY-MM-DD"
-          maxLength={10}
-          autoCapitalize="none"
-          onChangeText={(v) => update("due_date", v || null)}
-          editable={!action.busy}
+          onChange={(v) => update("due_date", v || null)}
+          disabled={action.busy}
+          optional
         />
         <Field
           label="הערות — רשות"

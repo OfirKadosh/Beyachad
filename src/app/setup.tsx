@@ -1,3 +1,4 @@
+import { DateField } from "../components/DateField";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text } from "react-native";
@@ -66,13 +67,12 @@ export default function Setup() {
               maxLength={60}
               placeholder="הזינו שם"
             />
-            <Field
+            <DateField
               label="תאריך חתונה — רשות"
               value={date}
-              onChangeText={setDate}
-              placeholder="YYYY-MM-DD"
-              autoCapitalize="none"
-              maxLength={10}
+              onChange={setDate}
+              disabled={action.busy}
+              optional
             />
             <Field
               label="תקציב יעד בשקלים — רשות"

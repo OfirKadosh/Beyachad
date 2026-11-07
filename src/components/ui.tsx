@@ -217,12 +217,14 @@ export function Card({
 }
 export function Button({
   title,
+  accessibilityLabel = title,
   onPress,
   secondary = false,
   disabled = false,
   busy = false,
 }: {
   title: string;
+  accessibilityLabel?: string;
   onPress(): void;
   secondary?: boolean;
   disabled?: boolean;
@@ -244,7 +246,7 @@ export function Button({
         onPressIn={() => press(0.975)}
         onPressOut={() => press(1)}
         accessibilityRole="button"
-        accessibilityLabel={title}
+        accessibilityLabel={accessibilityLabel}
         accessibilityState={{ disabled: disabled || busy, busy }}
         disabled={disabled || busy}
         onPress={onPress}
