@@ -6,7 +6,7 @@ import {
 } from "./guests";
 
 export const MAX_IMPORT_ROWS = 500;
-export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
+export const MAX_IMPORT_BYTES = 10 * 1024 * 1024;
 export const guestColumns: {
   key: keyof GuestDraft;
   label: string;

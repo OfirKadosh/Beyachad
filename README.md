@@ -294,7 +294,7 @@ No APNs/Expo push token or server credentials are collected by this implementati
 
 Open Guests → Import/export. XLSX and UTF-8 CSV support shared preview,
 column mapping, row exclusion, validation, duplicate skipping and additive
-imports up to 500 invitations / 5 MB. Export all or the active guest filter,
+imports up to 500 invitations / 10 MB. Export all or the active guest filter,
 or download an empty template. See [usage and limitations](docs/WEB-he.md).
 SheetJS is pinned to the vendor's official 0.20.3 tarball.
 Web downloads and native file sharing use platform adapters; no schema upgrade

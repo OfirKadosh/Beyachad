@@ -1,4 +1,7 @@
-export const DOCUMENT_LIMIT = 5 * 1024 * 1024;
+export const DOCUMENT_LIMIT = 10 * 1024 * 1024;
+// Account for base64 expansion and JSON metadata around a maximum-size file.
+export const DOCUMENT_REQUEST_LIMIT =
+  Math.ceil(DOCUMENT_LIMIT / 3) * 4 + 64 * 1024;
 export type WeddingDocument = {
   id: string;
   wedding_id: string;
@@ -18,7 +21,7 @@ export function validateDocument(
   if (!clean || clean.length > 160)
     throw Error("שם המסמך חייב להכיל 1–160 תווים.");
   if (!bytes.length || bytes.length > DOCUMENT_LIMIT)
-    throw Error("יש לבחור קובץ עד 5MB שאינו ריק.");
+    throw Error("יש לבחור קובץ עד 10MB שאינו ריק.");
   const pdf =
     mime === "application/pdf" &&
     String.fromCharCode(...bytes.slice(0, 5)) === "%PDF-";

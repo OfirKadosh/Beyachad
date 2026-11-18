@@ -134,7 +134,7 @@ function Transfer() {
     if (result.canceled) return;
     const asset = result.assets[0];
     if (asset.size && asset.size > MAX_IMPORT_BYTES)
-      throw Error("בחרו קובץ עד 5MB.");
+      throw Error("בחרו קובץ עד 10MB.");
     const bytes = await readPickedFile(asset),
       book = readGuestWorkbook(bytes, asset.name);
     setWorkbook(book);
@@ -224,7 +224,7 @@ function Transfer() {
         <Text style={styles.heading}>ייבוא מקובץ</Text>
         <Text style={styles.text}>
           בחרו XLSX או CSV בקידוד UTF-8, עם כותרות בשורה הראשונה. עד 500 הזמנות
-          ו־5MB. כל שורה היא הזמנה לאדם, לזוג או למשפחה.
+          ו־10MB. כל שורה היא הזמנה לאדם, לזוג או למשפחה.
         </Text>
         <Text style={styles.muted}>
           רק שם להזמנה הוא חובה. ברירת המחדל: מבוגר אחד, ללא ילדים, צד משותף

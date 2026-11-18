@@ -224,7 +224,7 @@ test("XLSX supports multiple sheets and blocks formulas and oversized ranges", (
     /מגבלה/,
   );
   assert.throws(
-    () => readGuestWorkbook(new Uint8Array(5 * 1024 * 1024 + 1), "g.xlsx"),
+    () => readGuestWorkbook(new Uint8Array(10 * 1024 * 1024 + 1), "g.xlsx"),
     /גדול/,
   );
   assert.throws(() => readGuestWorkbook(new Uint8Array([1]), "g.xlsx"), /תקין/);
@@ -254,4 +254,19 @@ test("CSV codec works without native TextEncoder/TextDecoder globals", () => {
     if (encoder) Object.defineProperty(globalThis, "TextEncoder", encoder);
     if (decoder) Object.defineProperty(globalThis, "TextDecoder", decoder);
   }
+});
+
+test("guest CSV accepts exactly 10 MiB and rejects one additional byte", () => {
+  const bytes = new Uint8Array(10 * 1024 * 1024).fill(32);
+  bytes.set(new TextEncoder().encode("name\nGuest"));
+  const table = readGuestWorkbook(bytes, "guests.csv").sheets[0].table;
+  assert.equal(
+    previewGuestImport(table, guessGuestMapping(table.headers), [])[0].draft
+      ?.name,
+    "Guest",
+  );
+  assert.throws(
+    () => readGuestWorkbook(new Uint8Array(bytes.length + 1), "guests.csv"),
+    /10MB/,
+  );
 });

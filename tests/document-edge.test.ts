@@ -124,8 +124,11 @@ test("document server rejects invalid auth, strangers, identifiers and oversized
     400,
   );
   assert.equal(
-    (await auth.request(payload, "valid", { "content-length": "8000000" }))
-      .status,
+    (
+      await auth.request(payload, "valid", {
+        "content-length": String(validation.DOCUMENT_REQUEST_LIMIT + 1),
+      })
+    ).status,
     413,
   );
   assert.deepEqual(auth.calls, []);
@@ -156,4 +159,27 @@ test("document removal keeps metadata when Storage deletion fails, allowing retr
     200,
   );
   assert.deepEqual(normal.calls, ["remove", "delete-metadata"]);
+});
+
+test("document upload accepts exactly 10 MiB including base64 transport overhead", async () => {
+  const bytes = new Uint8Array(10 * 1024 * 1024);
+  bytes.set(new TextEncoder().encode("%PDF-1.7\n"));
+  const base64 = validation.bytesToBase64(bytes);
+  assert.deepEqual(validation.base64ToBytes(base64), bytes);
+  const normal = server();
+  assert.equal((await normal.request({ ...payload, base64 })).status, 200);
+  assert.deepEqual(normal.calls, ["upload", "register"]);
+  const tooLarge = new Uint8Array(bytes.length + 1);
+  tooLarge.set(bytes);
+  const rejected = server();
+  assert.equal(
+    (
+      await rejected.request({
+        ...payload,
+        base64: validation.bytesToBase64(tooLarge),
+      })
+    ).status,
+    400,
+  );
+  assert.deepEqual(rejected.calls, []);
 });

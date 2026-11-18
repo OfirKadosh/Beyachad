@@ -60,7 +60,7 @@ export default function Documents() {
       if (result.canceled) return;
       const asset = result.assets[0];
       if (asset.size && asset.size > DOCUMENT_LIMIT)
-        throw Error("יש לבחור קובץ עד 5MB.");
+        throw Error("יש לבחור קובץ עד 10MB.");
       void action.run(async () => {
         const bytes = await readPickedFile(asset);
         await store.upload(
@@ -85,7 +85,7 @@ export default function Documents() {
       />
       <Title>הניירת מסודרת. הראש שקט.</Title>
       <Text style={styles.muted}>
-        חוזים וקבלות, פרטיים למרחב שלכם. PDF, PNG או JPEG עד 5MB; עד 100 מסמכים
+        חוזים וקבלות, פרטיים למרחב שלכם. PDF, PNG או JPEG עד 10MB; עד 100 מסמכים
         למרחב.
       </Text>
       {isDemo && (

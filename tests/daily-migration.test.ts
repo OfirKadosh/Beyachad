@@ -105,8 +105,21 @@ test("full migration chain: shared details, document isolation, ownership and ac
           [vendor, w, foreignVendor, other],
         );
         await db.query(
-          `select register_document($1,$2,$3,'חוזה.pdf','application/pdf',10,$4,null)`,
+          `select register_document($1,$2,$3,'חוזה.pdf','application/pdf',10485760,$4,null)`,
           [a, doc, w, vendor],
+        );
+        assert.equal(
+          await scalar(
+            "select file_size_limit from storage.buckets where id='wedding-documents'",
+          ),
+          10485760,
+        );
+        await assert.rejects(
+          db.query(
+            "select register_document($1,'10000000-0000-4000-8000-000000000005',$2,'too-big.pdf','application/pdf',10485761,null,null)",
+            [a, w],
+          ),
+          /documents_size_bytes_check/,
         );
         await assert.rejects(
           db.query(

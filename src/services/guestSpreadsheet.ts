@@ -84,7 +84,7 @@ export function readGuestWorkbook(
   name: string,
 ): GuestWorkbook {
   if (bytes.length > MAX_IMPORT_BYTES)
-    throw Error("הקובץ גדול מדי. ניתן לבחור קובץ עד 5MB.");
+    throw Error("הקובץ גדול מדי. ניתן לבחור קובץ עד 10MB.");
   if (!bytes.length) throw Error("הקובץ ריק.");
   if (/\.csv$/i.test(name)) {
     const text = decodeUtf8(bytes).replace(/^\uFEFF/, "");

@@ -1,5 +1,9 @@
 import { createClient } from "npm:@supabase/supabase-js@2.118.0";
-import { base64ToBytes, validateDocument } from "../_shared/documents.ts";
+import {
+  base64ToBytes,
+  validateDocument,
+  DOCUMENT_REQUEST_LIMIT,
+} from "../_shared/documents.ts";
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -34,7 +38,7 @@ Deno.serve(async (req) => {
     } = await service.auth.getUser(token);
     if (authError || !user)
       return response({ error: "Authentication required" }, 401);
-    if (Number(req.headers.get("content-length")) > 7100000)
+    if (Number(req.headers.get("content-length")) > DOCUMENT_REQUEST_LIMIT)
       return response({ error: "File too large" }, 413);
     // A streaming cap also protects requests without Content-Length.
     const reader = req.body?.getReader();
@@ -45,7 +49,7 @@ Deno.serve(async (req) => {
       const next = await reader.read();
       if (next.done) break;
       size += next.value.length;
-      if (size > 7100000) {
+      if (size > DOCUMENT_REQUEST_LIMIT) {
         await reader.cancel();
         return response({ error: "File too large" }, 413);
       }
